@@ -15,3 +15,7 @@ SELECT *
 SELECT *
   FROM CV
  WHERE name = 'stock_type'
+ 
+ SELECT *
+ FROM chado.CV
+ WHERE name = 'stock_availability';

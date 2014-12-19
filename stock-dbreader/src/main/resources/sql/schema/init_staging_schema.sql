@@ -20,4 +20,22 @@ AS
    LANGUAGE plpgsql;
 
 END
+
+CREATE OR REPLACE FUNCTION staging.get_tair_db_id_by_name (text)
+   RETURNS int
+AS
+   $$
+   DECLARE
+      result   integer;
+   BEGIN
+      SELECT
+       INTO result      db_id
+       FROM db
+      WHERE name =$1;
+
+      RETURN result;
+   END;
+   $$
+   LANGUAGE plpgsql;
+
 $$;

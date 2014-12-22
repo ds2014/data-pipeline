@@ -1,0 +1,4 @@
+${application.version}=1.0
+${application.formatted-version}=(TAIR Stock Reader v1.0)
+${spring-boot.version}=1.1.10.RELEASE
+${spring-boot.formatted-version}=1.1.10.RELEASE

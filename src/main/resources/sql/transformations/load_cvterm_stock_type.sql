@@ -1,4 +1,4 @@
-	WITH source AS(
+WITH source AS(
 SELECT
 	t.stock_type_id,
 	t.stock_type,
@@ -7,12 +7,7 @@ SELECT
 	0 is_obsolete,
 	0 is_relationshiptype
 FROM
-	public.dblink(
-	'dbname=tair_stock_tables host=pgsql-lan-dev user=tripal password=<>',
-	'select stock_type_id, stock_type from stocktype')
-	AS t(
-	stock_type_id int,
-	stock_type text )
+	tair_stg.stocktype t
 	JOIN dbxref dbx
 		ON
 		dbx.accession = t.stock_type
@@ -77,3 +72,4 @@ GROUP BY
 	s.dbxref_id,
 	s.is_obsolete,
 	s.is_relationshiptype
+	

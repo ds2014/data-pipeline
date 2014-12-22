@@ -30,6 +30,16 @@ public class Stock {
 		this.isObsolete = isObsolete;
 	}
 
+	public Stock(int stockId, String name, String description,
+			int stockTypeId, int dbxrefId, boolean isObsolete) {
+
+		this.stockId = stockId;
+		this.name = name;
+		this.description = description;
+		this.stockTypeId = stockTypeId;
+		this.dbxrefId = dbxrefId;
+		this.isObsolete = isObsolete;
+	}
 	public StockType getStockType() {
 		return stockType;
 	}

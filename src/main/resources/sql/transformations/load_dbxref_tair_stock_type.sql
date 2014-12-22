@@ -1,4 +1,4 @@
-	WITH source AS(
+WITH source AS(
 SELECT
 	t.stock_type_id,
 	t.stock_type,
@@ -12,13 +12,7 @@ SELECT
 	'TAIR Stock Types' as text)
 	description
 FROM
-	public.dblink(
-	'dbname=tair_stock_tables host=pgsql-lan-dev user=tripal password=<>',
-	'select stock_type_id, stock_type from stocktype')
-	AS t(
-	stock_type_id int,
-	stock_type text )
-	)
+	tair_stg.stocktype t)
 	,
 	upd AS(
 UPDATE
@@ -67,4 +61,4 @@ GROUP BY
 	s.stock_type,
 	s.db_id,
 	s.version_db,
-	s.description
+	s.description;

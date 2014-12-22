@@ -1,0 +1,39 @@
+select stock_id, name as stock_name, tair_object_id as primary_accession
+from tair_stg.stock
+limit 2
+
+
+--explore avaialable stocks on chado
+select s.*, dbx.*, db.*, c.* from stock s
+join
+dbxref dbx
+on 
+dbx.dbxref_id=s.dbxref_id
+join
+db
+on db.db_id = dbx.db_id
+join 
+cvterm c
+on 
+c.cvterm_id = s.type_id
+
+
+SELECT
+	*
+FROM
+	mchado.chado.stock_dbxref;
+	
+select * from 
+tair_stg.stock
+where name = 'CD3-178'
+
+select * from tair_stg.germplasm
+where germplasm_id = 1
+
+select * from
+tair_stg.germplasmstocknamesearch_wrk
+where name = 'CS1'
+
+
+select * from tair_stg.germplasm
+where germplasm_id = 500230923

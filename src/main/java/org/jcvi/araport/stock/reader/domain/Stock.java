@@ -9,7 +9,8 @@ public class Stock {
 	private boolean isObsolete;
 	private int stockTypeId;
 	private int dbxrefId;
-
+	private int tairObjectId;
+	
 	public Stock() {
 
 	}
@@ -96,4 +97,12 @@ public class Stock {
 		this.dbxrefId = dbxrefId;
 	}
 
+	
+	public int getTairObjectId() {
+		return tairObjectId;
+	}
+
+	public void setTairObjectId(int tairObjectId) {
+		this.tairObjectId = tairObjectId;
+	}
 }

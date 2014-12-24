@@ -257,7 +257,7 @@ REVOKE ALL ON SCHEMA batch FROM ibelyaev;
 GRANT ALL ON SCHEMA batch TO ibelyaev;
 GRANT ALL ON SCHEMA batch TO PUBLIC;
 
-
+--ALTER DATABASE mchado SET search_path=chado,public,batch,tair_stg;
 --
 -- PostgreSQL database dump complete
 --

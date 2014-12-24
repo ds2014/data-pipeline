@@ -47,6 +47,7 @@ public class ApplicationLauncher {
 
 		Log log = LogFactory.getLog(ApplicationLauncher.class);
 
+		//SpringApplication app = new SpringApplication(LoadStocksJobBatchConfiguration.class);
 		SpringApplication app = new SpringApplication(ApplicationLauncher.class);
 		app.setWebEnvironment(false);
 		ConfigurableApplicationContext ctx = app.run(args);

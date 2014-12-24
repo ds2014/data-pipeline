@@ -3,6 +3,7 @@ package org.araport.jcvi.stock.application;
 import javax.sql.DataSource;
 
 import org.jcvi.araport.stock.reader.batch.DbXrefItemProcessor;
+import org.jcvi.araport.stock.reader.batch.DbXrefItemReader;
 import org.jcvi.araport.stock.reader.batch.DbXrefItemWriter;
 import org.jcvi.araport.stock.reader.batch.DbXrefRowMapper;
 import org.jcvi.araport.stock.reader.domain.DbXref;
@@ -37,7 +38,7 @@ import org.springframework.transaction.PlatformTransactionManager;
 
 @Configuration
 @EnableBatchProcessing
-@Import({DataSourceInfrastructureConfiguration.class})
+@Import({DataSourceInfrastructureConfiguration.class,DbXrefItemReader.class})
 public class LoadStocksJobBatchConfiguration {
 
 	@Autowired
@@ -49,6 +50,9 @@ public class LoadStocksJobBatchConfiguration {
     @Autowired
     private StepBuilderFactory stepBuilderFactory;
     
+    @Autowired
+    private ItemReader<DbXref> dbReader;
+         
 	
 	//@Autowired
 	//JobLauncher jobLauncher;
@@ -98,7 +102,8 @@ public class LoadStocksJobBatchConfiguration {
 	public Step step(){
 		return stepBuilderFactory.get("step")
 				.<DbXref,DbXref>chunk(1) //important to be one in this case to commit after every line read
-				.reader(dbXRefReader())
+				//.reader(dbXRefReader())
+				.reader(dbReader)
 				.processor(dbXrefprocessor())
 				.writer(writer())
 				.listener(logProcessListener())
@@ -123,19 +128,7 @@ public class LoadStocksJobBatchConfiguration {
 	public ProtocolListener protocolListener(){
 		return new ProtocolListener();
 	}
-	@Bean
-	public ItemReader<DbXref> dbXRefReader(){
-		
-		JdbcCursorItemReader<DbXref> reader = new JdbcCursorItemReader<DbXref>();
-		String sql = "select db_id, accession as primary_accession, 'X' as secondary_accession, version, description from chado.dbxref";
-		
-		reader.setSql(sql);
-		reader.setDataSource(targetDataSource);
-		reader.setRowMapper(dbxRowMapper());
-		
-		return reader;
-	}
-	
+				
 	@Bean
 	public DbXrefRowMapper dbxRowMapper(){
 		return new DbXrefRowMapper();

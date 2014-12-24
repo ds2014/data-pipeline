@@ -74,7 +74,7 @@ public class DataSourceInfrastructureConfiguration implements InfrastructureConf
 	*/
 	
 	
-	@Bean(name = "batchDataSource", destroyMethod = "close")
+	@Bean(name = "targetDataSource", destroyMethod = "close")
 	public DataSource dataSource() {
 		BasicDataSource dataSource = new BasicDataSource();
 		dataSource.setDriverClassName(environment

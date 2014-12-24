@@ -1,6 +1,14 @@
 package org.jcvi.araport.stock.reader.domain;
 
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.apache.log4j.Logger;
+import org.jcvi.araport.stock.listeners.ProtocolListener;
+
 public class DbXref {
+	
+	private static final Log log = LogFactory.getLog(DbXref.class);
 	
 	private int dbId;
 	private String primaryAccession;
@@ -8,7 +16,6 @@ public class DbXref {
 	private String version;
 	private String description;
 
-	
 	
 	public DbXref(){
 		
@@ -68,4 +75,36 @@ public class DbXref {
 	}
 
 
+	public String toString(){
+		
+		StringBuilder result = new StringBuilder();
+		
+		result.append(" " + "dbId: " + dbId);
+		
+		if (!StringUtils.isBlank(this.primaryAccession)){
+			result.append("; " + "accession: " + this.primaryAccession);
+		}
+		
+		if (!StringUtils.isBlank(this.secondaryAccession)){
+			result.append("; " + "secondary accession: " +this.secondaryAccession);
+		}
+		
+		if (!StringUtils.isBlank(this.version)){
+			result.append("; " + "version: " + this.version);
+		}
+		
+		if (!StringUtils.isBlank(this.description)){
+			result.append("; " + "description: " + this.description);
+		}
+		
+		if (result.length() >0){
+			return result.toString();
+		}else
+		{
+			return null;
+		}
+	
+		
+		
+	}
 }

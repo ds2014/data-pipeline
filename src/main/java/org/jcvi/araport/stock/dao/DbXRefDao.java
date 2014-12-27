@@ -1,7 +1,7 @@
-package org.jcvi.araport.stock.reader.batch.dao;
+package org.jcvi.araport.stock.dao;
 
 public interface DbXRefDao {
-	
+		
 	public boolean addDbXRef(int dbId, String accession, String version, String description);
 	
 	public boolean updateDbXRef(int dbId, String accession, String version, String description);

@@ -7,7 +7,9 @@ import org.jcvi.araport.stock.reader.batch.DbXrefItemReader;
 import org.jcvi.araport.stock.reader.batch.DbXrefItemWriter;
 import org.jcvi.araport.stock.reader.batch.DbXrefRowMapper;
 import org.jcvi.araport.stock.reader.domain.DbXref;
+import org.jcvi.araport.stock.listeners.ItemFailureLoggerListener;
 import org.jcvi.araport.stock.listeners.LogProcessListener;
+import org.jcvi.araport.stock.listeners.LogStepStartStopListener;
 import org.jcvi.araport.stock.listeners.ProtocolListener;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
@@ -100,11 +102,11 @@ public class LoadStocksJobBatchConfiguration {
 	
 	@Bean
 	public Step step(){
-		return stepBuilderFactory.get("step")
+		return stepBuilderFactory.get("step").listener(stepStartStopListener())
 				.<DbXref,DbXref>chunk(1) //important to be one in this case to commit after every line read
 				//.reader(dbXRefReader())
 				.reader(dbReader)
-				.processor(dbXrefprocessor())
+				.processor(dbXrefProcessor())
 				.writer(writer())
 				.listener(logProcessListener())
 				.faultTolerant()
@@ -120,7 +122,7 @@ public class LoadStocksJobBatchConfiguration {
 	
 	/** configure the processor related stuff */
     @Bean
-    public ItemProcessor<DbXref, DbXref> dbXrefprocessor() {
+    public ItemProcessor<DbXref, DbXref> dbXrefProcessor() {
         return new DbXrefItemProcessor();
     }
 	
@@ -128,15 +130,20 @@ public class LoadStocksJobBatchConfiguration {
 	public ProtocolListener protocolListener(){
 		return new ProtocolListener();
 	}
-				
-	@Bean
-	public DbXrefRowMapper dbxRowMapper(){
-		return new DbXrefRowMapper();
-	}
-	
+			
+		
 	@Bean
 	public LogProcessListener logProcessListener(){
 		return new LogProcessListener();
+	}
+	
+	@Bean
+	public LogStepStartStopListener stepStartStopListener(){
+		return new LogStepStartStopListener();
+	}
+	
+	@Bean ItemFailureLoggerListener itemFailureListener(){
+		return new ItemFailureLoggerListener();
 	}
 
 }

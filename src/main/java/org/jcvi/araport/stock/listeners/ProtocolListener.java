@@ -16,7 +16,7 @@ import org.springframework.batch.core.StepExecution;
 public class ProtocolListener implements JobExecutionListener  {
 
 	
-	private static final Log LOGGER = LogFactory.getLog(ProtocolListener.class);
+	private static final Log log = LogFactory.getLog(ProtocolListener.class);
 
 	public void afterJob(JobExecution jobExecution) {
 		StringBuilder protocol = new StringBuilder();
@@ -47,7 +47,7 @@ public class ProtocolListener implements JobExecutionListener  {
 			protocol.append("Filter: " + stepExecution.getFilterCount() + "\n");					
 			protocol.append("+++++++++++++++++++++++++++++++++++++++++++++++++++++++ \n");
 		}
-		LOGGER.info(protocol.toString());
+		log.info(protocol.toString());
 	}
 
 	@Override

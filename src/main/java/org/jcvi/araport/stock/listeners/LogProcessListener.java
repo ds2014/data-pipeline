@@ -1,12 +1,11 @@
 package org.jcvi.araport.stock.listeners;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.log4j.Logger;
 import org.springframework.batch.core.ItemProcessListener;
 
 public class LogProcessListener implements ItemProcessListener<Object, Object> {
 
-	private static final Log log = LogFactory.getLog(LogProcessListener.class);
+	private static final Logger  log = Logger.getLogger(LogProcessListener.class);
 
 	public void afterProcess(Object item, Object result) {
 		if(item!=null) log.info("Input to Item Processor: " + item.toString());

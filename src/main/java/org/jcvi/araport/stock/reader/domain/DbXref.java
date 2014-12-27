@@ -15,7 +15,7 @@ public class DbXref {
 	private String secondaryAccession;
 	private String version;
 	private String description;
-
+	private Db db;
 	
 	public DbXref(){
 		
@@ -74,6 +74,14 @@ public class DbXref {
 		this.description = description;
 	}
 
+
+	public Db getDb() {
+		return db;
+	}
+
+	public void setDb(Db db) {
+		this.db = db;
+	}
 
 	public String toString(){
 		

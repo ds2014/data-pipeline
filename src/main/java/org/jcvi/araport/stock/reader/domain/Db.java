@@ -7,12 +7,16 @@ public class Db {
 
 	private static final Logger  log = Logger.getLogger(Db.class);
 	
-	private int db_id;
+	private int dbId;
 	private String name;
 	private String description;
 	private String urlprefix;
 	private String url;
 	
+	
+	public Db(){
+		
+	}
 	
 	public Db(String name, String description, String urlprefix, String url) {
 		this.name = name;
@@ -22,10 +26,10 @@ public class Db {
 	}
 	
 	
-	public Db(int db_id, String name, String description, String urlprefix, String url) {
+	public Db(int dbId, String name, String description, String urlprefix, String url) {
 		
 		this(name, description, urlprefix, url);
-		this.db_id = db_id;
+		this.dbId = dbId;
 	}
 
 	@Override
@@ -75,13 +79,13 @@ public class Db {
 	}
 
 
-	public int getDb_id() {
-		return db_id;
+	public int getDbId() {
+		return dbId;
 	}
 
 
-	public void setDb_id(int db_id) {
-		this.db_id = db_id;
+	public void setDbId(int dbId) {
+		this.dbId = dbId;
 	}
 
 
@@ -127,7 +131,7 @@ public class Db {
 	
 	@Override
 	public String toString() {
-		return "Db [db_id=" + db_id + ", name=" + name + ", description="
+		return "Db [db_id=" + dbId + ", name=" + name + ", description="
 				+ description + ", urlprefix=" + urlprefix + ", url=" + url
 				+ "]";
 	}

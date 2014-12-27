@@ -5,6 +5,7 @@ import javax.sql.DataSource;
 
 import org.araport.jcvi.stock.application.DataSourceInfrastructureConfiguration;
 import org.jcvi.araport.stock.reader.domain.DbXref;
+import org.jcvi.araport.stock.service.impl.DbDaoImpl;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.database.JdbcCursorItemReader;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,7 +15,7 @@ import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Component;
 
 @Component("reader")
-@Import({DataSourceInfrastructureConfiguration.class})
+@Import({DataSourceInfrastructureConfiguration.class, DbDaoImpl.class})
 public class DbXrefItemReader {
 	
 	@Autowired 

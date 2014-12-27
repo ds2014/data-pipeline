@@ -26,7 +26,7 @@ public class DbXrefItemReader {
 	public ItemReader<DbXref> dbReader(){
 		
 		JdbcCursorItemReader<DbXref> reader = new JdbcCursorItemReader<DbXref>();
-		String sql = "select db_id, accession as primary_accession, 'X' as secondary_accession, version, description from chado.dbxref";
+		String sql = "select db_id, accession as primary_accession, 'X' as secondary_accession, version, description from chado.dbxref limit 2";
 		
 		reader.setSql(sql);
 		reader.setDataSource(targetDataSource);

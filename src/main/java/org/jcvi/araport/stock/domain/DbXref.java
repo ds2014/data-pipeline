@@ -1,4 +1,4 @@
-package org.jcvi.araport.stock.reader.domain;
+package org.jcvi.araport.stock.domain;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;

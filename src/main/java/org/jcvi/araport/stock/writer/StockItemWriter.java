@@ -1,4 +1,4 @@
-package org.jcvi.araport.stock.reader.batch;
+package org.jcvi.araport.stock.writer;
 
 import java.util.List;
 

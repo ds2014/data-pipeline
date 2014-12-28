@@ -1,13 +1,13 @@
-package org.jcvi.araport.stock.reader.batch;
+package org.jcvi.araport.stock.reader;
 
 import javax.sql.DataSource;
 
 import org.araport.jcvi.stock.application.DataSourceInfrastructureConfiguration;
-import org.jcvi.araport.stock.reader.domain.DbXref;
-import org.jcvi.araport.stock.reader.domain.SourceStockDrivingQuery;
+import org.jcvi.araport.stock.dao.impl.DbDaoImpl;
+import org.jcvi.araport.stock.domain.DbXref;
+import org.jcvi.araport.stock.domain.SourceStockDrivingQuery;
 import org.jcvi.araport.stock.rowmapper.SourceStockDrivingQueryRowMapper;
 import org.jcvi.araport.stock.rowmapper.beans.RowMapperBeans;
-import org.jcvi.araport.stock.service.impl.DbDaoImpl;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.database.JdbcCursorItemReader;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,7 +30,7 @@ public class SourceStockDrivingQueryReader {
 	public ItemReader<SourceStockDrivingQuery> sourceStockReader(){
 		
 		JdbcCursorItemReader<SourceStockDrivingQuery> reader = new JdbcCursorItemReader<SourceStockDrivingQuery>();
-		String sql = "select stock_id from tair_stg.stock";
+		String sql = "select stock_id from tair_stg.stock limit 2";
 		
 		reader.setSql(sql);
 		reader.setDataSource(targetDataSource);

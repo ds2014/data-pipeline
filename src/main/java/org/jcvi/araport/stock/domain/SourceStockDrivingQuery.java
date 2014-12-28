@@ -1,4 +1,4 @@
-package org.jcvi.araport.stock.reader.domain;
+package org.jcvi.araport.stock.domain;
 
 public class SourceStockDrivingQuery {
 	

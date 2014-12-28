@@ -1,4 +1,4 @@
-package org.jcvi.araport.stock.reader.batch;
+package org.jcvi.araport.stock.reader;
 
 import org.springframework.batch.item.ItemReader;
 import org.springframework.stereotype.Component;

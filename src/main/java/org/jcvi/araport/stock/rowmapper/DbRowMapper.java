@@ -1,9 +1,9 @@
-package org.jcvi.araport.stock.reader.batch;
+package org.jcvi.araport.stock.rowmapper;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-import org.jcvi.araport.stock.reader.domain.Db;
+import org.jcvi.araport.stock.domain.Db;
 import org.springframework.jdbc.core.RowMapper;
 
 public class DbRowMapper implements RowMapper<Db> {

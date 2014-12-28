@@ -1,4 +1,4 @@
-package org.jcvi.araport.stock.reader.domain;
+package org.jcvi.araport.stock.domain;
 
 import org.apache.log4j.Logger;
 import org.jcvi.araport.stock.listeners.ItemFailureLoggerListener;

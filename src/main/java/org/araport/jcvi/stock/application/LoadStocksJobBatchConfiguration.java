@@ -2,14 +2,14 @@ package org.araport.jcvi.stock.application;
 
 import javax.sql.DataSource;
 
-import org.jcvi.araport.stock.reader.batch.DbXrefItemProcessor;
-import org.jcvi.araport.stock.reader.batch.DbXrefItemProcessor1;
-import org.jcvi.araport.stock.reader.batch.DbXrefItemReader;
-import org.jcvi.araport.stock.reader.batch.DbXrefItemWriter;
-import org.jcvi.araport.stock.reader.batch.DbXrefRowMapper;
-import org.jcvi.araport.stock.reader.batch.SourceStockDrivingQueryReader;
-import org.jcvi.araport.stock.reader.domain.DbXref;
-import org.jcvi.araport.stock.reader.domain.SourceStockDrivingQuery;
+import org.jcvi.araport.stock.processor.DbXrefItemProcessor;
+import org.jcvi.araport.stock.processor.DbXrefItemProcessor1;
+import org.jcvi.araport.stock.reader.DbXrefItemReader;
+import org.jcvi.araport.stock.reader.SourceStockDrivingQueryReader;
+import org.jcvi.araport.stock.rowmapper.DbXrefRowMapper;
+import org.jcvi.araport.stock.writer.DbXrefItemWriter;
+import org.jcvi.araport.stock.domain.DbXref;
+import org.jcvi.araport.stock.domain.SourceStockDrivingQuery;
 import org.jcvi.araport.stock.listeners.ItemFailureLoggerListener;
 import org.jcvi.araport.stock.listeners.LogProcessListener;
 import org.jcvi.araport.stock.listeners.LogStepStartStopListener;

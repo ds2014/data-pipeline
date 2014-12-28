@@ -1,4 +1,4 @@
-package org.jcvi.araport.stock.service.impl;
+package org.jcvi.araport.stock.dao.impl;
 
 import java.util.HashMap;
 import java.util.List;
@@ -10,9 +10,9 @@ import javax.sql.DataSource;
 import org.apache.log4j.Logger;
 import org.araport.jcvi.stock.application.DataSourceInfrastructureConfiguration;
 import org.jcvi.araport.stock.dao.DbDao;
-import org.jcvi.araport.stock.reader.batch.DbRowMapper;
-import org.jcvi.araport.stock.reader.batch.DbXrefItemProcessor;
-import org.jcvi.araport.stock.reader.domain.Db;
+import org.jcvi.araport.stock.domain.Db;
+import org.jcvi.araport.stock.processor.DbXrefItemProcessor;
+import org.jcvi.araport.stock.rowmapper.DbRowMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Import;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcOperations;

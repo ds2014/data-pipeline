@@ -1,11 +1,12 @@
-package org.jcvi.araport.stock.reader.batch;
+package org.jcvi.araport.stock.reader;
 
 import javax.annotation.Resource;
 import javax.sql.DataSource;
 
 import org.araport.jcvi.stock.application.DataSourceInfrastructureConfiguration;
-import org.jcvi.araport.stock.reader.domain.DbXref;
-import org.jcvi.araport.stock.service.impl.DbDaoImpl;
+import org.jcvi.araport.stock.dao.impl.DbDaoImpl;
+import org.jcvi.araport.stock.domain.DbXref;
+import org.jcvi.araport.stock.rowmapper.DbXrefRowMapper;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.database.JdbcCursorItemReader;
 import org.springframework.beans.factory.annotation.Autowired;

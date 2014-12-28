@@ -1,12 +1,12 @@
-package org.jcvi.araport.stock.reader.batch;
+package org.jcvi.araport.stock.processor;
 
 import org.apache.log4j.Logger;
 import org.araport.jcvi.stock.application.DataSourceInfrastructureConfiguration;
 import org.jcvi.araport.stock.dao.DbDao;
-import org.jcvi.araport.stock.reader.domain.Db;
-import org.jcvi.araport.stock.reader.domain.DbXref;
-import org.jcvi.araport.stock.reader.domain.SourceStockDrivingQuery;
-import org.jcvi.araport.stock.service.impl.DbDaoImpl;
+import org.jcvi.araport.stock.dao.impl.DbDaoImpl;
+import org.jcvi.araport.stock.domain.Db;
+import org.jcvi.araport.stock.domain.DbXref;
+import org.jcvi.araport.stock.domain.SourceStockDrivingQuery;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Import;

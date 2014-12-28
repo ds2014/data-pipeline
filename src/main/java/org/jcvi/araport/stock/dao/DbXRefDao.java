@@ -2,7 +2,7 @@ package org.jcvi.araport.stock.dao;
 
 import javax.sql.DataSource;
 
-import org.jcvi.araport.stock.reader.domain.DbXref;
+import org.jcvi.araport.stock.domain.DbXref;
 
 public interface DbXRefDao {
 		

@@ -29,7 +29,7 @@ public class OrganismDaoImpl implements OrganismDao {
 	
 	private static final Logger log = Logger
 			.getLogger(OrganismDaoImpl.class);
-	private final String FIND_BY_NAME_SQL = "select organism_id, abbreviation, genus, species,  common_name from chado.db where common_name =:name";
+	private final String FIND_BY_NAME_SQL = "select organism_id, abbreviation, genus, species,  common_name from chado.organism where common_name =:name";
 
 	private NamedParameterJdbcOperations namedParameterJdbcTemplate;
 	
@@ -79,5 +79,12 @@ public class OrganismDaoImpl implements OrganismDao {
 	
 	public OrganismRowMapper rowMapper() {
 		return new OrganismRowMapper();
+	}
+
+	@Override
+	public void setDataSource(DataSource datasource) {
+		this.namedParameterJdbcTemplate = new NamedParameterJdbcTemplate(
+				datasource);
+		
 	}
 }

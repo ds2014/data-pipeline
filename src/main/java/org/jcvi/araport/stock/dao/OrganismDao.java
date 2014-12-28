@@ -1,5 +1,7 @@
 package org.jcvi.araport.stock.dao;
 
+import javax.sql.DataSource;
+
 import org.jcvi.araport.stock.domain.Organism;
 
 public interface OrganismDao {
@@ -8,5 +10,7 @@ public interface OrganismDao {
 	public Organism findByName(String name);
 	public void merge(Organism organism);
 	public void update(Organism organism);
+	
+	public void setDataSource(DataSource datasource);
 
 }

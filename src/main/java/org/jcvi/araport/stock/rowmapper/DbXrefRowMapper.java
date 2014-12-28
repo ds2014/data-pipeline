@@ -14,8 +14,7 @@ public class DbXrefRowMapper implements RowMapper<DbXref> {
 		DbXref dbXRef = new DbXref();
 		dbXRef.setDbXrefId(rs.getInt("dbxref_id"));
 		dbXRef.setDbId(rs.getInt("db_id"));
-		dbXRef.setPrimaryAccession(rs.getString("primary_accession"));
-		dbXRef.setSecondaryAccession(rs.getString("secondary_accession"));
+		dbXRef.setPrimaryAccession(rs.getString("accession"));
 		dbXRef.setVersion(rs.getString("version"));
 		dbXRef.setDescription(rs.getString("description"));
 		

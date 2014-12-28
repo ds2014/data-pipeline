@@ -7,9 +7,11 @@ import org.jcvi.araport.stock.processor.DbXrefItemProcessor1;
 import org.jcvi.araport.stock.reader.DbXrefItemReader;
 import org.jcvi.araport.stock.reader.SourceStockDrivingQueryReader;
 import org.jcvi.araport.stock.rowmapper.DbXrefRowMapper;
+import org.jcvi.araport.stock.rowmapper.beans.RowMapperBeans;
 import org.jcvi.araport.stock.writer.DbXrefItemWriter;
 import org.jcvi.araport.stock.domain.DbXref;
 import org.jcvi.araport.stock.domain.SourceStockDrivingQuery;
+import org.jcvi.araport.stock.domain.Stock;
 import org.jcvi.araport.stock.listeners.ItemFailureLoggerListener;
 import org.jcvi.araport.stock.listeners.LogProcessListener;
 import org.jcvi.araport.stock.listeners.LogStepStartStopListener;
@@ -43,7 +45,7 @@ import org.springframework.transaction.PlatformTransactionManager;
 
 @Configuration
 @EnableBatchProcessing
-@Import({DataSourceInfrastructureConfiguration.class,DbXrefItemReader.class, SourceStockDrivingQueryReader.class})
+@Import({DataSourceInfrastructureConfiguration.class,DbXrefItemReader.class, SourceStockDrivingQueryReader.class, RowMapperBeans.class})
 public class LoadStocksJobBatchConfiguration {
 
 	@Autowired
@@ -60,6 +62,12 @@ public class LoadStocksJobBatchConfiguration {
     
     @Autowired
     private ItemReader <SourceStockDrivingQuery> sourceStockReader;
+    
+    @Autowired
+    private ItemProcessor<SourceStockDrivingQuery, Stock> stockItemProcessor;
+    
+    @Autowired
+    private ItemWriter<Stock> stockItemWriter;
          
 	
 	//@Autowired
@@ -122,6 +130,8 @@ public class LoadStocksJobBatchConfiguration {
 	
 	*/
 	
+	// last working config
+	/*
 	@Bean
 	public Step step(){
 		return stepBuilderFactory.get("step").listener(stepStartStopListener())
@@ -130,6 +140,20 @@ public class LoadStocksJobBatchConfiguration {
 				.reader(sourceStockReader)
 				.processor(dbXrefProcessor())
 				.writer(writer())
+				.listener(logProcessListener())
+				.faultTolerant()
+				.build();
+	}
+	*/
+	
+	@Bean
+	public Step step(){
+		return stepBuilderFactory.get("step").listener(stepStartStopListener())
+				.<SourceStockDrivingQuery,Stock>chunk(50) //important to be one in this case to commit after every line read
+				//.reader(dbXRefReader())
+				.reader(sourceStockReader)
+				.processor(stockItemProcessor)
+				.writer(stockItemWriter)
 				.listener(logProcessListener())
 				.faultTolerant()
 				.build();

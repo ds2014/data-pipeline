@@ -14,6 +14,8 @@ public interface StockDao {
 	
 	public void merge(Stock stock);
 	
+	public Stock lookupSourceStockById(long stockId);
+	
 	public void setDataSource(DataSource datasource);
 	
 }

@@ -1,5 +1,6 @@
 package org.jcvi.araport.stock.processor;
 
+import javax.annotation.PostConstruct;
 import javax.sql.DataSource;
 
 import org.apache.log4j.Logger;
@@ -32,11 +33,11 @@ public class StockItemProcessor implements ItemProcessor <SourceStockDrivingQuer
 	@Autowired
 	private DbDao dbDao;
 	
-	@Autowired
 	private DbXRefDao dbXrefDao;
 	
-	@Autowired
 	private OrganismDao organismDao;
+	
+	private StockDao stockDao;
 
 	private static final Logger log = Logger
 			.getLogger(StockItemProcessor.class);
@@ -55,13 +56,17 @@ public class StockItemProcessor implements ItemProcessor <SourceStockDrivingQuer
 		int dbId = tairStockDb.getDbId();
 		
 		String accession = String.valueOf(sourceStockId);
+		
+		log.info("Source Stock Id = " + sourceStockId);
+		log.info("DBXRef accession = " + accession);
+		
 		DbXref dbXref = dbXrefDao.findDbXrefByAccessionAndDb(dbId, accession);
 			
 		if (dbXref == null) { // create DbXRef accession
 			log.info("DBXref is null. Creating DbXref Accession = " + accession);
 			dbXrefDao.merge(dbXref);
 		} else {
-			log.info("DBXref exists!");
+			log.info("DBXref exists!" + dbXref);
 		}
 		
 		
@@ -71,7 +76,7 @@ public class StockItemProcessor implements ItemProcessor <SourceStockDrivingQuer
 			log.info("Organism is null. Creating Organism = " + "mouse-ear cress");
 			//dbXrefDao.merge(dbXref);
 		} else {
-			log.info("Organism exists!");
+			log.info("Organism exists! " + organism);
 		}
 		
 		
@@ -85,10 +90,30 @@ public class StockItemProcessor implements ItemProcessor <SourceStockDrivingQuer
 		
 		
 		int dbXRefId = dbXref.getDbXrefId();
-			
 		
-		return null;
+		Stock sourceStock = stockDao.lookupSourceStockById(sourceStockId);
+		sourceStock.setDbxrefId(dbXref.getDbXrefId());
+		sourceStock.setOrganismId(organism.getOrganismId());
+		
+		if (sourceStock == null) { // create stock
+			log.info("Stock is null. Creating Stock = " + sourceStockId);
+			//dbXrefDao.merge(dbXref);
+		} else {
+			log.info("Stock exists! ");
+		}
+		
+		return stock;
 		
 	}
 
+	
+	@PostConstruct
+	public void setDao(){
+		this.dbXrefDao = new DbXrefDaoImpl();
+		this.dbXrefDao.setDataSource(targetDataSource);
+		this.organismDao = new OrganismDaoImpl();
+		this.organismDao.setDataSource(targetDataSource);
+		this.stockDao = new StockDaoImpl();
+		this.stockDao.setDataSource(targetDataSource);
+	}
 }

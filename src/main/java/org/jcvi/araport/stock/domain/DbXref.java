@@ -84,38 +84,7 @@ public class DbXref {
 		this.db = db;
 	}
 
-	public String toString(){
 		
-		StringBuilder result = new StringBuilder();
-		
-		result.append(" " + "dbId: " + dbId);
-		
-		if (!StringUtils.isBlank(this.primaryAccession)){
-			result.append("; " + "accession: " + this.primaryAccession);
-		}
-		
-		if (!StringUtils.isBlank(this.secondaryAccession)){
-			result.append("; " + "secondary accession: " +this.secondaryAccession);
-		}
-		
-		if (!StringUtils.isBlank(this.version)){
-			result.append("; " + "version: " + this.version);
-		}
-		
-		if (!StringUtils.isBlank(this.description)){
-			result.append("; " + "description: " + this.description);
-		}
-		
-		if (result.length() >0){
-			return result.toString();
-		}else
-		{
-			return null;
-		}
-		
-	}
-	
-	
 	public int getDbXrefId() {
 		return dbXrefId;
 	}
@@ -123,4 +92,13 @@ public class DbXref {
 	public void setDbXrefId(int dbXrefId) {
 		this.dbXrefId = dbXrefId;
 	}
+
+	@Override
+	public String toString() {
+		return "DbXref [dbXrefId=" + dbXrefId + ", dbId=" + dbId
+				+ ", primaryAccession=" + primaryAccession + ", version="
+				+ version + ", description=" + description + "]";
+	}
+	
+	
 }

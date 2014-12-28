@@ -2,8 +2,9 @@ package org.jcvi.araport.stock.domain;
 
 public class Stock {
 
-	private int stockId;
+	private long stockId;
 	private String name;
+	private String uniqueName;
 	private String description;
 	private StockType stockType;
 	private boolean isObsolete;
@@ -16,7 +17,7 @@ public class Stock {
 
 	}
 
-	public Stock(int stockId, String name, String description,
+	public Stock(long stockId, String name, String description,
 			StockType stockType) {
 
 		this.stockId = stockId;
@@ -25,14 +26,14 @@ public class Stock {
 		this.stockType = stockType;
 	}
 
-	public Stock(int stockId, String name, String description,
+	public Stock(long stockId, String name, String description,
 			StockType stockType, boolean isObsolete) {
 
 		this(stockId, name, description, stockType);
 		this.isObsolete = isObsolete;
 	}
 
-	public Stock(int stockId, String name, String description,
+	public Stock(long stockId, String name, String description,
 			int stockTypeId, int dbxrefId, boolean isObsolete) {
 
 		this.stockId = stockId;
@@ -50,12 +51,8 @@ public class Stock {
 		this.stockType = stockType;
 	}
 
-	public int getStockId() {
+	public long getStockId() {
 		return stockId;
-	}
-
-	public void setStockId(int stockId) {
-		this.stockId = stockId;
 	}
 
 	public String getName() {
@@ -113,6 +110,27 @@ public class Stock {
 
 	public void setOrganismId(int organismId) {
 		this.organismId = organismId;
+	}
+
+	@Override
+	public String toString() {
+		return "Stock [stockId=" + stockId + ", name=" + name
+				+ ", description=" + description + ", stockType=" + stockType
+				+ ", isObsolete=" + isObsolete + ", stockTypeId=" + stockTypeId
+				+ ", dbxrefId=" + dbxrefId + ", tairObjectId=" + tairObjectId
+				+ ", organismId=" + organismId + "]";
+	}
+
+	public String getUniqueName() {
+		return uniqueName;
+	}
+
+	public void setUniqueName(String uniqueName) {
+		this.uniqueName = uniqueName;
+	}
+
+	public void setStockId(long stockId) {
+		this.stockId = stockId;
 	}
 
 }

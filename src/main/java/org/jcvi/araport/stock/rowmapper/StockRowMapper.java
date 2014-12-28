@@ -12,12 +12,12 @@ public class StockRowMapper implements RowMapper<Stock> {
 	public Stock mapRow(ResultSet rs, int rowNum) throws SQLException {
 		
 		Stock stock = new Stock();
-		stock.setStockId(rs.getInt("stock_id"));
+		stock.setStockId(rs.getLong("stock_id"));
 		stock.setDbxrefId(rs.getInt("dbxref_id"));
 		stock.setName(rs.getString("name"));
 		stock.setUniqueName(rs.getString("uniquename"));
 		stock.setStockTypeId(rs.getInt("type_id"));
-		stock.setTairObjectId(rs.getInt("tair_object_id"));
+		stock.setTairObjectId(rs.getLong("tair_object_id"));
 		stock.setDescription(rs.getString("description"));
 		stock.setObsolete(rs.getBoolean("is_obsolete"));
 		

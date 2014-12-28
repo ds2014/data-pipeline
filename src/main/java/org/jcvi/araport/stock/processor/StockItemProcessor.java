@@ -87,22 +87,12 @@ public class StockItemProcessor implements ItemProcessor <SourceStockDrivingQuer
 		stock.setStockTypeId(44354);
 		stock.setName("CD3-179");
 		stock.setOrganismId(6);
-		
-		
-		int dbXRefId = dbXref.getDbXrefId();
-		
+						
 		Stock sourceStock = stockDao.lookupSourceStockById(sourceStockId);
 		sourceStock.setDbxrefId(dbXref.getDbXrefId());
 		sourceStock.setOrganismId(organism.getOrganismId());
-		
-		if (sourceStock == null) { // create stock
-			log.info("Stock is null. Creating Stock = " + sourceStockId);
-			//dbXrefDao.merge(dbXref);
-		} else {
-			log.info("Stock exists! ");
-		}
-		
-		return stock;
+			
+		return sourceStock;
 		
 	}
 

@@ -10,7 +10,7 @@ public class Stock {
 	private boolean isObsolete;
 	private int stockTypeId;
 	private int dbxrefId;
-	private int tairObjectId;
+	private long tairObjectId;
 	private int organismId;
 	
 	public Stock() {
@@ -96,11 +96,11 @@ public class Stock {
 	}
 
 	
-	public int getTairObjectId() {
+	public long getTairObjectId() {
 		return tairObjectId;
 	}
 
-	public void setTairObjectId(int tairObjectId) {
+	public void setTairObjectId(long tairObjectId) {
 		this.tairObjectId = tairObjectId;
 	}
 	

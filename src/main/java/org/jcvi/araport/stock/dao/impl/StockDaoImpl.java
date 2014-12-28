@@ -31,7 +31,7 @@ public class StockDaoImpl implements StockDao{
 			.getLogger(OrganismDaoImpl.class);
 	private final String FIND_BY_NAME_SQL = "select organism_id, abbreviation, genus, species,  common_name from chado.organism where common_name =:name";
 	
-	private final String FIND_BY_SOURCE_ID_SQL = "SELECT s.stock_id, " +
+	private final String FIND_BY_SOURCE_ID_SQL = "SELECT cast(s.stock_id as bigint) stock_id, " +
 			"acc.dbxref_id, " +
 			"6 organism_id, " +
 			"cast(s.name as varchar(255)) as name, " +
@@ -40,15 +40,30 @@ public class StockDaoImpl implements StockDao{
 			"c.cvterm_id as type_id, " +
 			"cast (s.is_obsolete as boolean) as is_obsolete, " +
 			"tair_object_id " +
-		"FROM  tair_stg.stock s JOIN tair_stg.stocktype st " +
+			"FROM  tair_stg.stock s JOIN tair_stg.stocktype st " +
 				"ON s.stock_type_id = st.stock_type_id JOIN cvterm c " +
 				"ON c.name = st.stock_type JOIN dbxref dbx " +
 				"ON dbx.dbxref_id = c.dbxref_id JOIN dbxref acc " +
 				"ON cast(s.stock_id as varchar(255)) = acc.accession AND " +
 			    "acc.db_id = staging.get_tair_db_id_by_name('TAIR Stock') " +
 		"WHERE 	dbx.db_id = 1 " +			
-			"and s.stock_id =:stock_id";
+			"and cast(s.stock_id as bigint) =:stock_id";
+	
+	private String UPDATE_SQL = "UPDATE " +
+			"chado.stock t " +
+			"SET dbxref_id =:dbxref_id, " +
+				"organism_id =:organism_id , " +
+				"name = :name, " +
+				"uniquename =:uniquename, " +
+				"description =:description, " +
+				"type_id = :type_id, " +
+				"is_obsolete =FALSE " +
+			"WHERE 	t.stock_id =:stock_id";
 
+	private final String INSERT_SQL = "INSERT " + 
+			"			INTO chado.stock (stock_id, dbxref_id, organism_id, name, uniquename, description, type_id, is_obsolete) " + 
+			"VALUES (:stock_id,:dbxref_id,:organism_id,:name,:uniquename,:description,:type_id,FALSE)";
+	
 	private NamedParameterJdbcOperations namedParameterJdbcTemplate;
 	
 	
@@ -66,8 +81,22 @@ public class StockDaoImpl implements StockDao{
 	
 	@Override
 	public void merge(Stock stock) {
+		Map<String, Object> params = new HashMap<String, Object>();
+		params.put("stock_id", stock.getStockId());
+		params.put("organism_id", stock.getOrganismId());
+		params.put("dbxref_id", stock.getDbxrefId());
+		params.put("type_id", stock.getStockTypeId());
+		params.put("name", stock.getName());
+		params.put("uniquename", stock.getUniqueName());
+		params.put("description", stock.getDescription());
+		params.put("is_obsolete", stock.getDescription());
 		
+		int updatedCount = namedParameterJdbcTemplate.update(UPDATE_SQL, params);
 		
+		if (updatedCount == 0){ //perform insert
+			namedParameterJdbcTemplate.update(INSERT_SQL, params);
+		}
+	
 	}
 
 	@Override

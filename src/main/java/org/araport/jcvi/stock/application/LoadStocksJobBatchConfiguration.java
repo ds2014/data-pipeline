@@ -2,6 +2,7 @@ package org.araport.jcvi.stock.application;
 
 import javax.sql.DataSource;
 
+import org.araport.jcvi.stock.executors.TaskExecutorConfig;
 import org.jcvi.araport.stock.processor.DbXrefItemProcessor;
 import org.jcvi.araport.stock.processor.DbXrefItemProcessor1;
 import org.jcvi.araport.stock.reader.DbXrefItemReader;
@@ -39,13 +40,14 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.core.env.Environment;
+import org.springframework.core.task.TaskExecutor;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.PlatformTransactionManager;
 
 @Configuration
 @EnableBatchProcessing
-@Import({DataSourceInfrastructureConfiguration.class,DbXrefItemReader.class, SourceStockDrivingQueryReader.class, RowMapperBeans.class})
+@Import({DataSourceInfrastructureConfiguration.class,DbXrefItemReader.class, SourceStockDrivingQueryReader.class, RowMapperBeans.class, TaskExecutorConfig.class})
 public class LoadStocksJobBatchConfiguration {
 
 	@Autowired
@@ -68,6 +70,9 @@ public class LoadStocksJobBatchConfiguration {
     
     @Autowired
     private ItemWriter<Stock> stockItemWriter;
+    
+    @Autowired
+    private TaskExecutor taskExecutor;
          
 	
 	//@Autowired
@@ -149,13 +154,13 @@ public class LoadStocksJobBatchConfiguration {
 	@Bean
 	public Step step(){
 		return stepBuilderFactory.get("step").listener(stepStartStopListener())
-				.<SourceStockDrivingQuery,Stock>chunk(50) //important to be one in this case to commit after every line read
+				.<SourceStockDrivingQuery,Stock>chunk(100) //important to be one in this case to commit after every line read
 				//.reader(dbXRefReader())
 				.reader(sourceStockReader)
 				.processor(stockItemProcessor)
-				.writer(stockItemWriter)
+				.writer(stockItemWriter).taskExecutor(taskExecutor).throttleLimit(2)
 				.listener(logProcessListener())
-				.faultTolerant()
+			   // .faultTolerant()
 				.build();
 	}
 	

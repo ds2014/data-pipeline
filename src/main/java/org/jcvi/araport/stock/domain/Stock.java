@@ -10,6 +10,7 @@ public class Stock {
 	private int stockTypeId;
 	private int dbxrefId;
 	private int tairObjectId;
+	private int organismId;
 	
 	public Stock() {
 
@@ -105,4 +106,13 @@ public class Stock {
 	public void setTairObjectId(int tairObjectId) {
 		this.tairObjectId = tairObjectId;
 	}
+	
+	public int getOrganismId() {
+		return organismId;
+	}
+
+	public void setOrganismId(int organismId) {
+		this.organismId = organismId;
+	}
+
 }

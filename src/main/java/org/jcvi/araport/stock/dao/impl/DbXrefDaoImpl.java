@@ -31,7 +31,7 @@ public class DbXrefDaoImpl implements DbXRefDao {
 	private static final Logger log = Logger
 			.getLogger(DbXrefDaoImpl.class);
 	
-	private final String FIND_BY_ACCESSION_AND_DB_SQL = "select db_id, accession, version, description from chado.dbxref where db_id =:db_id and accession =:accession";
+	private final String FIND_BY_ACCESSION_AND_DB_SQL = "select dbxref_id, db_id, accession, version, description from chado.dbxref where db_id =:db_id and accession =:accession";
     private final String UPDATE_SQL = "UPDATE chado.dbxref t SET db_id =:db_id, accession =:accession, version = :version, " +
     		"description =:description " +
     		"WHERE 	t.db_id =:db_id AND " + 
@@ -64,7 +64,7 @@ public class DbXrefDaoImpl implements DbXRefDao {
 				+ "dbId = " + dbId + "accession = " + accession);
 
 		List<DbXref> results = namedParameterJdbcTemplate.query(
-				FIND_BY_ACCESSION_AND_DB_SQL, params, rowRowMapper());
+				FIND_BY_ACCESSION_AND_DB_SQL, params, rowMapper());
 
 		if (results != null && results.size() > 0) {
 			return results.get(0);
@@ -75,7 +75,12 @@ public class DbXrefDaoImpl implements DbXRefDao {
 
 	@Override
 	public void merge(DbXref dbXref) {
-		//DbXref founddbXref = findDbXrefByAccessionAndDb(dbXref.getDbId(), dbXref.getPrimaryAccession());
+	    //DbXref founddbXref = findDbXrefByAccessionAndDb(dbXref.getDbId(), dbXref.getPrimaryAccession());
+	    
+	   // if (founddbXref !=null){
+	  //  log.info("Found Stock Accession in DbXref: " + founddbXref);
+	    
+	  //  }
 		Map<String, Object> params = new HashMap<String, Object>();
 		params.put("db_id", dbXref.getDbId());
 		params.put("accession", dbXref.getPrimaryAccession());
@@ -104,7 +109,7 @@ public class DbXrefDaoImpl implements DbXRefDao {
 				targetDataSource);
 	}
 
-	public DbXrefRowMapper rowRowMapper() {
+	public DbXrefRowMapper rowMapper() {
 		return new DbXrefRowMapper();
 	}
 

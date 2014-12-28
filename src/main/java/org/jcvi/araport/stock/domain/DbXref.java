@@ -10,6 +10,7 @@ public class DbXref {
 	
 	private static final Log log = LogFactory.getLog(DbXref.class);
 	
+	private int dbXrefId;
 	private int dbId;
 	private String primaryAccession;
 	private String secondaryAccession;
@@ -111,8 +112,15 @@ public class DbXref {
 		{
 			return null;
 		}
+		
+	}
 	
-		
-		
+	
+	public int getDbXrefId() {
+		return dbXrefId;
+	}
+
+	public void setDbXrefId(int dbXrefId) {
+		this.dbXrefId = dbXrefId;
 	}
 }

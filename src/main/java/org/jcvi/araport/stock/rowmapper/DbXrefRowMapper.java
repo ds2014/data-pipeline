@@ -12,6 +12,7 @@ public class DbXrefRowMapper implements RowMapper<DbXref> {
 	public DbXref mapRow(ResultSet rs, int rowNum) throws SQLException {
 		
 		DbXref dbXRef = new DbXref();
+		dbXRef.setDbXrefId(rs.getInt("dbxref_id"));
 		dbXRef.setDbId(rs.getInt("db_id"));
 		dbXRef.setPrimaryAccession(rs.getString("primary_accession"));
 		dbXRef.setSecondaryAccession(rs.getString("secondary_accession"));

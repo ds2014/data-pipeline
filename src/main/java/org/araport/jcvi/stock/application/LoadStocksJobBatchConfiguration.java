@@ -3,10 +3,13 @@ package org.araport.jcvi.stock.application;
 import javax.sql.DataSource;
 
 import org.jcvi.araport.stock.reader.batch.DbXrefItemProcessor;
+import org.jcvi.araport.stock.reader.batch.DbXrefItemProcessor1;
 import org.jcvi.araport.stock.reader.batch.DbXrefItemReader;
 import org.jcvi.araport.stock.reader.batch.DbXrefItemWriter;
 import org.jcvi.araport.stock.reader.batch.DbXrefRowMapper;
+import org.jcvi.araport.stock.reader.batch.SourceStockDrivingQueryReader;
 import org.jcvi.araport.stock.reader.domain.DbXref;
+import org.jcvi.araport.stock.reader.domain.SourceStockDrivingQuery;
 import org.jcvi.araport.stock.listeners.ItemFailureLoggerListener;
 import org.jcvi.araport.stock.listeners.LogProcessListener;
 import org.jcvi.araport.stock.listeners.LogStepStartStopListener;
@@ -40,7 +43,7 @@ import org.springframework.transaction.PlatformTransactionManager;
 
 @Configuration
 @EnableBatchProcessing
-@Import({DataSourceInfrastructureConfiguration.class,DbXrefItemReader.class})
+@Import({DataSourceInfrastructureConfiguration.class,DbXrefItemReader.class, SourceStockDrivingQueryReader.class})
 public class LoadStocksJobBatchConfiguration {
 
 	@Autowired
@@ -54,6 +57,9 @@ public class LoadStocksJobBatchConfiguration {
     
     @Autowired
     private ItemReader<DbXref> dbReader;
+    
+    @Autowired
+    private ItemReader <SourceStockDrivingQuery> sourceStockReader;
          
 	
 	//@Autowired
@@ -100,6 +106,7 @@ public class LoadStocksJobBatchConfiguration {
 				.build();
 	}	
 	
+	/*
 	@Bean
 	public Step step(){
 		return stepBuilderFactory.get("step").listener(stepStartStopListener())
@@ -112,6 +119,22 @@ public class LoadStocksJobBatchConfiguration {
 				.faultTolerant()
 				.build();
 	}
+	
+	*/
+	
+	@Bean
+	public Step step(){
+		return stepBuilderFactory.get("step").listener(stepStartStopListener())
+				.<SourceStockDrivingQuery,DbXref>chunk(50) //important to be one in this case to commit after every line read
+				//.reader(dbXRefReader())
+				.reader(sourceStockReader)
+				.processor(dbXrefProcessor())
+				.writer(writer())
+				.listener(logProcessListener())
+				.faultTolerant()
+				.build();
+	}
+	
 	// end::jobstep[]
 	
 	 @Bean
@@ -121,11 +144,18 @@ public class LoadStocksJobBatchConfiguration {
 	 
 	
 	/** configure the processor related stuff */
+	 
+	/*
     @Bean
     public ItemProcessor<DbXref, DbXref> dbXrefProcessor() {
         return new DbXrefItemProcessor();
     }
-	
+	*/
+	 
+    @Bean
+    public ItemProcessor<SourceStockDrivingQuery, DbXref> dbXrefProcessor() {
+        return new DbXrefItemProcessor1();
+    }
 	@Bean
 	public ProtocolListener protocolListener(){
 		return new ProtocolListener();

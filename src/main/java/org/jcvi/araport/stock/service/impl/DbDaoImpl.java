@@ -27,7 +27,7 @@ public class DbDaoImpl implements DbDao {
 	DataSource targetDataSource;
 
 	private static final Logger log = Logger
-			.getLogger(DbXrefItemProcessor.class);
+			.getLogger(DbDaoImpl.class);
 	private final String FIND_BY_NAME_SQL = "select db_id, name, description, urlprefix,  url from chado.db where name =:name";
 
 	private NamedParameterJdbcOperations namedParameterJdbcTemplate;

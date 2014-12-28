@@ -1,13 +1,19 @@
 package org.jcvi.araport.stock.dao;
 
+import javax.sql.DataSource;
+
+import org.jcvi.araport.stock.reader.domain.DbXref;
+
 public interface DbXRefDao {
 		
-	public boolean addDbXRef(int dbId, String accession, String version, String description);
+	public boolean create(DbXref dbXref);
 	
-	public boolean updateDbXRef(int dbId, String accession, String version, String description);
+	public boolean update(DbXref dbXref);
 	
-	public boolean updateDbXRebyAccessionDb(int dbId, String accession);
+	public DbXref findDbXrefByAccessionAndDb(int dbId, String accession);
 	
-	public int findDbXrefByAccessionDb(int dbId, String accession);
+	public void merge(DbXref dbXref);
+	
+	public void setDataSource(DataSource datasource);
 
 }

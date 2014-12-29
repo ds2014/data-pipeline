@@ -10,7 +10,7 @@ import org.jcvi.araport.stock.reader.SourceStockDrivingQueryReader;
 import org.jcvi.araport.stock.rowmapper.DbXrefRowMapper;
 import org.jcvi.araport.stock.rowmapper.beans.RowMapperBeans;
 import org.jcvi.araport.stock.tasklet.DbLookupTasklet;
-
+import org.jcvi.araport.stock.tasklet.StockPropertiesCVTermLookupTasklet;
 import org.jcvi.araport.stock.writer.DbXrefItemWriter;
 import org.jcvi.araport.stock.domain.Db;
 import org.jcvi.araport.stock.domain.DbXref;
@@ -50,11 +50,16 @@ import org.springframework.transaction.PlatformTransactionManager;
 
 @Configuration
 @EnableBatchProcessing
-@Import({DataSourceInfrastructureConfiguration.class,DbXrefItemReader.class, SourceStockDrivingQueryReader.class, RowMapperBeans.class, TaskExecutorConfig.class, DbLookupTasklet.class})
+@Import({ DataSourceInfrastructureConfiguration.class, DbXrefItemReader.class,
+		SourceStockDrivingQueryReader.class, RowMapperBeans.class,
+		TaskExecutorConfig.class, DbLookupTasklet.class,
+		StockPropertiesCVTermLookupTasklet.class})
+
 public class LoadStocksJobBatchConfiguration {
 
 	public static final String STOCK_MASTER_LOADING_STEP = "stockMasterLoadingStep";
 	public static final String DB_LOOKUP_LOADING_STEP = "dbLookupLoadingStep";
+	public static final String DB_CVTERM_LOADING_STEP = "dbCVTermLookupLoadingStep";
 	public static final String STOCK_CROSSREFERENCES_LOADING_STEP = "stockCrossReferencesLoadingStep";
 	public static final String STOCK_PROPERTIES_LOADING_STEP = "stockPropertiesLoadingStep";
 	public static final String GERMPLASM_MASTER_LOADING_STEP = "germplasmMasterLoadingStep";
@@ -135,6 +140,7 @@ public class LoadStocksJobBatchConfiguration {
 				//.next(dbLookupLoadingStep())
 				.start(dbLookupLoadingStep())
 				.next(stockMasterLoadingStep())
+				.next(dbStockPropertiesCVTermLookup())
 				.build();
 	}	
 	
@@ -194,6 +200,15 @@ public class LoadStocksJobBatchConfiguration {
 				.build();
     }
 	
+		
+	@Bean
+    public Step dbStockPropertiesCVTermLookup() {
+        return stepBuilders
+                .get(DB_CVTERM_LOADING_STEP)
+                .tasklet(dbCVTermLookupTasklet())
+				.build();
+    }
+	
 	 @Bean
 	    public ItemWriter<DbXref> writer() {
 	    	return new DbXrefItemWriter();
@@ -202,6 +217,11 @@ public class LoadStocksJobBatchConfiguration {
 	 @Bean
 	 public DbLookupTasklet dbLookupTasklet(){
 		 return new DbLookupTasklet();
+	 }
+	 
+	 @Bean
+	 public StockPropertiesCVTermLookupTasklet dbCVTermLookupTasklet(){
+		 return new StockPropertiesCVTermLookupTasklet();
 	 }
 	
 	/** configure the processor related stuff */

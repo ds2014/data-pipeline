@@ -1,5 +1,7 @@
 package org.jcvi.araport.stock.dao.impl;
 
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -17,6 +19,8 @@ import org.jcvi.araport.stock.processor.DbXrefItemProcessor;
 import org.jcvi.araport.stock.rowmapper.DbRowMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Import;
+import org.springframework.dao.DataAccessException;
+import org.springframework.jdbc.core.PreparedStatementCallback;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcOperations;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Component;
@@ -114,6 +118,22 @@ public class DbDaoImpl implements DbDao {
     
 	public DbRowMapper dbRowMapper() {
 		return new DbRowMapper();
+	}
+
+	@Override
+	public void executeSQL(String sql) {
+		
+		Map<String,Object> map=new HashMap<String,Object>();  
+		
+		this.namedParameterJdbcTemplate.execute(sql,map,new PreparedStatementCallback() {  
+		    @Override  
+		    public Object doInPreparedStatement(PreparedStatement ps)  
+		            throws SQLException, DataAccessException {  
+		        return ps.executeUpdate();  
+		    }
+		 
+		});  
+		
 	}
 
 }

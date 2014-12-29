@@ -13,4 +13,6 @@ public interface DbDao {
 	public void setTairDbId();
 	public void setTairStockDb();
 	
+	public void executeSQL(String sql);
+	
 }

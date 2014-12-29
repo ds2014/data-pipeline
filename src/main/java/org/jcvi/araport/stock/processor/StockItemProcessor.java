@@ -110,9 +110,7 @@ public class StockItemProcessor implements ItemProcessor <SourceStockDrivingQuer
 		log.info("Looking up secondary accession in DBXRef" + secondaryAccession);
 		
 		DbXref secondarydbXref = dbXrefDao.findDbXrefByAccessionAndDb(tair_db_id, secondaryAccession);
-		
-		log.info("Merge with return!");
-		
+					
 		secondarydbXref = new DbXref();
 		secondarydbXref.setDbId(tair_db_id);
 		secondarydbXref.setPrimaryAccession(secondaryAccession);

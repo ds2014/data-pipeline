@@ -52,7 +52,7 @@ public class DbLookupTasklet implements Tasklet {
 		
 		log.info(ApplicationContstants.TAIR_DB_ID + ": " + dbDao.getTairStockDbId());
 		log.info(ApplicationContstants.TAIR_STOCK_DB_ID + ": " + dbDao.getTairStockDbId());
-		return null;
+		return RepeatStatus.FINISHED;
 	}
 
 	private void saveDbLookups(String key, int value, ExecutionContext jobContext){

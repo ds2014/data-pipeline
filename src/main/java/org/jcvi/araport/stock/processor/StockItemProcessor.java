@@ -17,6 +17,7 @@ import org.jcvi.araport.stock.domain.Db;
 import org.jcvi.araport.stock.domain.DbXref;
 import org.jcvi.araport.stock.domain.Organism;
 import org.jcvi.araport.stock.domain.SourceStockDrivingQuery;
+import org.jcvi.araport.stock.domain.StockDbXref;
 import org.jcvi.araport.stock.writer.DbXrefItemWriter;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.listener.StepExecutionListenerSupport;
@@ -65,14 +66,21 @@ public class StockItemProcessor implements ItemProcessor <SourceStockDrivingQuer
 		
 		DbXref dbXref = dbXrefDao.findDbXrefByAccessionAndDb(dbId, accession);
 			
-		if (dbXref == null) { // create DbXRef accession
-			log.info("DBXref is null. Creating DbXref Accession = " + accession);
+		if (dbXref == null) { // create Primary DbXRef accession
+			log.info("DBXref is null. Creating Primary DbXref Accession = " + accession);
+			
+			
+			dbXref = new DbXref();
+			dbXref.setDbId(tairStockDb.getDbId());
+			dbXref.setPrimaryAccession(accession);
+			dbXref.setDescription("TAIR Stock Primary Accession");
+			dbXref.setVersion("");
+			
 			dbXrefDao.merge(dbXref);
 		} else {
-			log.info("DBXref exists!" + dbXref);
+			log.info("Primary Acession DBXref exists! " + dbXref);
 		}
-		
-		
+				
 		Organism organism = organismDao.findByName("mouse-ear cress");
 		
 		if (organism == null) { // create organism
@@ -94,7 +102,33 @@ public class StockItemProcessor implements ItemProcessor <SourceStockDrivingQuer
 		Stock sourceStock = stockDao.lookupSourceStockById(sourceStockId);
 		sourceStock.setDbxrefId(dbXref.getDbXrefId());
 		sourceStock.setOrganismId(organism.getOrganismId());
-			
+		
+		
+		int  tair_db_id = dbDao.getTairDBId();
+		String secondaryAccession = String.valueOf(sourceStock.getTairObjectId());
+		
+		log.info("Looking up secondary accession in DBXRef" + secondaryAccession);
+		
+		DbXref secondarydbXref = dbXrefDao.findDbXrefByAccessionAndDb(tair_db_id, secondaryAccession);
+		
+		log.info("Merge with return!");
+		
+		secondarydbXref = new DbXref();
+		secondarydbXref.setDbId(tair_db_id);
+		secondarydbXref.setPrimaryAccession(secondaryAccession);
+		secondarydbXref.setDescription("TAIR Stock Secondary Accession");
+		secondarydbXref.setVersion("");
+		
+		secondarydbXref = dbXrefDao.mergeAndReturn(secondarydbXref);
+		log.info("Secondary Accession Primary key:" + secondarydbXref.getDbXrefId());
+		
+		StockDbXref stockRef = new StockDbXref();
+		stockRef.setDbXrefId(secondarydbXref.getDbXrefId());
+		stockRef.setDbXrefId(secondarydbXref.getDbId());
+		stockRef.setStockId(sourceStock.getStockId());
+		
+		sourceStock.setStockRef(stockRef);
+		
 		return sourceStock;
 		
 	}

@@ -12,7 +12,9 @@ import org.araport.jcvi.stock.application.DataSourceInfrastructureConfiguration;
 import org.jcvi.araport.stock.dao.StockDao;
 import org.jcvi.araport.stock.domain.DbXref;
 import org.jcvi.araport.stock.domain.Stock;
+import org.jcvi.araport.stock.domain.StockDbXref;
 import org.jcvi.araport.stock.rowmapper.OrganismRowMapper;
+import org.jcvi.araport.stock.rowmapper.StockDbXrefRowMapper;
 import org.jcvi.araport.stock.rowmapper.StockRowMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Import;
@@ -29,8 +31,7 @@ public class StockDaoImpl implements StockDao{
 	
 	private static final Logger log = Logger
 			.getLogger(OrganismDaoImpl.class);
-	private final String FIND_BY_NAME_SQL = "select organism_id, abbreviation, genus, species,  common_name from chado.organism where common_name =:name";
-	
+		
 	private final String FIND_BY_SOURCE_ID_SQL = "SELECT cast(s.stock_id as bigint) stock_id, " +
 			"acc.dbxref_id, " +
 			"6 organism_id, " +
@@ -63,6 +64,15 @@ public class StockDaoImpl implements StockDao{
 	private final String INSERT_SQL = "INSERT " + 
 			"			INTO chado.stock (stock_id, dbxref_id, organism_id, name, uniquename, description, type_id, is_obsolete) " + 
 			"VALUES (:stock_id,:dbxref_id,:organism_id,:name,:uniquename,:description,:type_id,FALSE)";
+	
+	private final String INSERT_STOCK_DBXREF_SQL =	"INSERT INTO stock_dbxref (stock_id, dbxref_id, is_current) " +
+	"VALUES(:stock_id, :dbxref_id, true)";
+	
+	private final String UPDATE_STOCK_DBXREF_SQL =	"UPDATE stock_dbxref t " +
+	"SET dbxref_id =:dbxref_id, " +
+	"is_current = true " +
+	"WHERE stock_id =:stock_id";
+	
 	
 	private NamedParameterJdbcOperations namedParameterJdbcTemplate;
 	
@@ -142,6 +152,24 @@ public class StockDaoImpl implements StockDao{
 	
 	public StockRowMapper rowMapper() {
 		return new StockRowMapper();
+	}
+	
+	public StockDbXrefRowMapper stockRefrowMapper() {
+		return new StockDbXrefRowMapper();
+	}
+
+	@Override
+	public void merge(StockDbXref stockRef) {
+		
+		Map<String, Object> params = new HashMap<String, Object>();
+		params.put("stock_id", stockRef.getStockId());
+		params.put("dbxref_id", stockRef.getDbXrefId());
+				
+		int updatedCount = namedParameterJdbcTemplate.update(UPDATE_STOCK_DBXREF_SQL, params);
+		
+		if (updatedCount == 0){ //perform insert
+			namedParameterJdbcTemplate.update(INSERT_STOCK_DBXREF_SQL, params);
+		}
 	}
 
 	

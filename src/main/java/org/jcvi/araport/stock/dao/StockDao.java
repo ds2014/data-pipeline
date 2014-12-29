@@ -3,6 +3,7 @@ package org.jcvi.araport.stock.dao;
 import javax.sql.DataSource;
 
 import org.jcvi.araport.stock.domain.Stock;
+import org.jcvi.araport.stock.domain.StockDbXref;
 
 public interface StockDao {
 
@@ -15,6 +16,8 @@ public interface StockDao {
 	public void merge(Stock stock);
 	
 	public Stock lookupSourceStockById(long stockId);
+	
+	public void merge(StockDbXref stockRef);
 	
 	public void setDataSource(DataSource datasource);
 	

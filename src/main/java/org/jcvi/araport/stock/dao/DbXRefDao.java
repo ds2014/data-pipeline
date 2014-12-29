@@ -14,6 +14,8 @@ public interface DbXRefDao {
 	
 	public void merge(DbXref dbXref);
 	
+	public DbXref mergeAndReturn(DbXref dbXref);
+	
 	public void setDataSource(DataSource datasource);
 
 }

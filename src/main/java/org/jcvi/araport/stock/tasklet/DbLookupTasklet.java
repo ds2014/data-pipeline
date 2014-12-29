@@ -47,7 +47,7 @@ public class DbLookupTasklet implements Tasklet {
         dbDao.setTairDbId();
         dbDao.setTairStockDb();
         
-       	saveDbLookups(ApplicationContstants.TAIR_DB_ID, dbDao.getTairStockDbId(), jobContext);
+       	saveDbLookups(ApplicationContstants.TAIR_DB_ID, dbDao.getTairDBId(), jobContext);
 		saveDbLookups(ApplicationContstants.TAIR_STOCK_DB_ID, dbDao.getTairStockDbId(), jobContext);
 		
 		log.info(ApplicationContstants.TAIR_DB_ID + ": " + dbDao.getTairStockDbId());

@@ -180,7 +180,7 @@ public class LoadStocksJobBatchConfiguration {
 				//.reader(dbXRefReader())
 				.reader(sourceStockReader)
 				.processor(stockItemProcessor)
-				.writer(stockItemWriter).taskExecutor(taskExecutor).throttleLimit(2)
+				.writer(stockItemWriter).taskExecutor(taskExecutor).throttleLimit(1)
 				.listener(logProcessListener())
 				 // .faultTolerant()
 				.build();

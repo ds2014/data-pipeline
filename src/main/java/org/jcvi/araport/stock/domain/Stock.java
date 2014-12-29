@@ -12,6 +12,7 @@ public class Stock {
 	private int dbxrefId;
 	private long tairObjectId;
 	private int organismId;
+	private StockDbXref stockRef = new StockDbXref();
 	
 	public Stock() {
 
@@ -131,6 +132,14 @@ public class Stock {
 
 	public void setStockId(long stockId) {
 		this.stockId = stockId;
+	}
+
+	public StockDbXref getStockRef() {
+		return stockRef;
+	}
+
+	public void setStockRef(StockDbXref stockRef) {
+		this.stockRef = stockRef;
 	}
 
 }

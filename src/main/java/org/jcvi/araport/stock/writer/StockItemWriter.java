@@ -44,6 +44,10 @@ public class StockItemWriter implements ItemWriter<Stock> {
 			
 			log.info("Stock To Write= " + item);
 			stockDao.merge(item);
+			
+			if (item.getStockRef().getDbXrefId()!=0){
+				stockDao.merge(item.getStockRef());
+			}
 		}
 		
 	}

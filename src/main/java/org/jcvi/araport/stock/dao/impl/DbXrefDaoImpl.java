@@ -1,5 +1,8 @@
 package org.jcvi.araport.stock.dao.impl;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -17,8 +20,14 @@ import org.jcvi.araport.stock.rowmapper.DbRowMapper;
 import org.jcvi.araport.stock.rowmapper.DbXrefRowMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Import;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.PreparedStatementCreator;
+import org.springframework.jdbc.core.namedparam.BeanPropertySqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcOperations;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
+import org.springframework.jdbc.core.namedparam.SqlParameterSource;
+import org.springframework.jdbc.support.GeneratedKeyHolder;
+import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Component;
 
 @Component("dbx_dao")
@@ -39,8 +48,17 @@ public class DbXrefDaoImpl implements DbXRefDao {
     
     private final String INSERT_SQL = "INSERT INTO chado.dbxref (db_id, accession, version, description) " +
 "VALUES (:db_id, :accession, :version, :description)";
+    
+    private final String INSERT_SQL_RETURN_KEY = "INSERT INTO chado.dbxref (db_id, accession, version, description) " +
+			 "VALUES (?, ?, ?, ?)";
+    
+    private final String UPDATE_SQL_RETURN_KEY = "UPDATE chado.dbxref t SET db_id =?, accession=?, version =?, " +
+    		"description=? " +
+    		"WHERE 	t.db_id=? AND " + 
+    		"t.accession=?";
 	
 	private NamedParameterJdbcOperations namedParameterJdbcTemplate;
+	private JdbcTemplate jdbcTemplate;
 
 	@Override
 	public boolean create(DbXref dbXref) {
@@ -75,12 +93,7 @@ public class DbXrefDaoImpl implements DbXRefDao {
 
 	@Override
 	public void merge(DbXref dbXref) {
-	    //DbXref founddbXref = findDbXrefByAccessionAndDb(dbXref.getDbId(), dbXref.getPrimaryAccession());
-	    
-	   // if (founddbXref !=null){
-	  //  log.info("Found Stock Accession in DbXref: " + founddbXref);
-	    
-	  //  }
+	   
 		Map<String, Object> params = new HashMap<String, Object>();
 		params.put("db_id", dbXref.getDbId());
 		params.put("accession", dbXref.getPrimaryAccession());
@@ -92,21 +105,14 @@ public class DbXrefDaoImpl implements DbXRefDao {
 		if (updatedCount == 0){ //perform insert
 			namedParameterJdbcTemplate.update(INSERT_SQL, params);
 		}
-	
-		/*
-		if (founddbXref != null){
-			update(dbXref);
-		}else{
-			create(dbXref);
-		}
-		*/
-
+			
 	}
 
 	@PostConstruct
 	public void setDataSource() {
 		this.namedParameterJdbcTemplate = new NamedParameterJdbcTemplate(
 				targetDataSource);
+		this.jdbcTemplate = new JdbcTemplate(targetDataSource);
 	}
 
 	public DbXrefRowMapper rowMapper() {
@@ -117,7 +123,65 @@ public class DbXrefDaoImpl implements DbXRefDao {
 	public void setDataSource(DataSource datasource) {
 		this.namedParameterJdbcTemplate = new NamedParameterJdbcTemplate(
 				datasource);
+		this.jdbcTemplate = new JdbcTemplate(datasource);
 		
+		
+	}
+
+	@Override
+	public DbXref mergeAndReturn(final DbXref dbXref) {
+		Map<String, Object> params = new HashMap<String, Object>();
+		params.put("db_id", dbXref.getDbId());
+		params.put("accession", dbXref.getPrimaryAccession());
+		params.put("version", dbXref.getVersion());
+		params.put("description", dbXref.getDescription());
+			
+		KeyHolder keyHolder = new GeneratedKeyHolder();
+		int rowCount = jdbcTemplate.update(new PreparedStatementCreator() {
+	        public PreparedStatement createPreparedStatement(
+	            Connection connection) throws SQLException {
+	                PreparedStatement ps = connection.prepareStatement(
+	                		UPDATE_SQL_RETURN_KEY, new String[] { "dbxref_id" });
+	                
+	                ps.setInt(1, dbXref.getDbId());
+	                ps.setString(2,dbXref.getPrimaryAccession());
+	                ps.setString(3,dbXref.getVersion());
+	                ps.setString(4,dbXref.getDescription());
+	                ps.setInt(5, dbXref.getDbId());
+	                ps.setString(6,dbXref.getPrimaryAccession());
+	                
+	                return ps;
+	            }
+	        }, keyHolder);
+		
+	   if (rowCount == 0){
+		   rowCount = jdbcTemplate.update(new PreparedStatementCreator() {
+		        public PreparedStatement createPreparedStatement(
+		            Connection connection) throws SQLException {
+		                PreparedStatement ps = connection.prepareStatement(
+		                		UPDATE_SQL_RETURN_KEY, new String[] { "dbxref_id" });
+		                
+		                ps.setInt(1, dbXref.getDbId());
+		                ps.setString(2,dbXref.getPrimaryAccession());
+		                ps.setString(3,dbXref.getVersion());
+		                ps.setString(4,dbXref.getDescription());
+		                ps.setInt(5, dbXref.getDbId());
+		                ps.setString(6,dbXref.getPrimaryAccession());
+		                
+		                return ps;
+		            }
+		        }, keyHolder);
+	   }
+		log.info("DbXRef Primary Key generated :" + keyHolder.getKey().intValue());
+		
+		DbXref createdDbXref = new DbXref();
+		createdDbXref.setDbXrefId(keyHolder.getKey().intValue());
+		createdDbXref.setDbId(dbXref.getDbId());
+		createdDbXref.setPrimaryAccession(dbXref.getPrimaryAccession());
+		createdDbXref.setVersion(dbXref.getVersion());
+		createdDbXref.setDescription(dbXref.getDescription());
+			
+		return createdDbXref;
 	}
 
 }

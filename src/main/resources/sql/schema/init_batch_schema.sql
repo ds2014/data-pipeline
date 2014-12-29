@@ -20,7 +20,7 @@ CREATE SCHEMA batch;
 -- Name: SCHEMA batch; Type: COMMENT; Schema: -; Owner: -
 --
 
-COMMENT ON SCHEMA batch IS 'standard public schema';
+COMMENT ON SCHEMA batch IS 'batch metadata schema';
 
 
 SET search_path = batch, pg_catalog;
@@ -253,8 +253,8 @@ ALTER TABLE ONLY batch_step_execution_context
 --
 
 REVOKE ALL ON SCHEMA batch FROM PUBLIC;
-REVOKE ALL ON SCHEMA batch FROM ibelyaev;
-GRANT ALL ON SCHEMA batch TO ibelyaev;
+REVOKE ALL ON SCHEMA batch FROM tripal2;
+GRANT ALL ON SCHEMA batch TO trupal2;
 GRANT ALL ON SCHEMA batch TO PUBLIC;
 
 --ALTER DATABASE mchado SET search_path=chado,public,batch,tair_stg;

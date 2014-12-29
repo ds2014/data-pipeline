@@ -124,7 +124,6 @@ public class StockItemProcessor implements ItemProcessor <SourceStockDrivingQuer
 		
 		StockDbXref stockRef = new StockDbXref();
 		stockRef.setDbXrefId(secondarydbXref.getDbXrefId());
-		stockRef.setDbXrefId(secondarydbXref.getDbId());
 		stockRef.setStockId(sourceStock.getStockId());
 		
 		sourceStock.setStockRef(stockRef);

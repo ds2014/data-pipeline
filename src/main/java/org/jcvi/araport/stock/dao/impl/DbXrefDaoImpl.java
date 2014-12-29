@@ -159,15 +159,13 @@ public class DbXrefDaoImpl implements DbXRefDao {
 		        public PreparedStatement createPreparedStatement(
 		            Connection connection) throws SQLException {
 		                PreparedStatement ps = connection.prepareStatement(
-		                		UPDATE_SQL_RETURN_KEY, new String[] { "dbxref_id" });
+		                		INSERT_SQL_RETURN_KEY, new String[] { "dbxref_id" });
 		                
 		                ps.setInt(1, dbXref.getDbId());
 		                ps.setString(2,dbXref.getPrimaryAccession());
 		                ps.setString(3,dbXref.getVersion());
 		                ps.setString(4,dbXref.getDescription());
-		                ps.setInt(5, dbXref.getDbId());
-		                ps.setString(6,dbXref.getPrimaryAccession());
-		                
+		                		                
 		                return ps;
 		            }
 		        }, keyHolder);

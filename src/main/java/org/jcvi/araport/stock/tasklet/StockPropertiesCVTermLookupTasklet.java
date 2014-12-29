@@ -131,6 +131,11 @@ public class StockPropertiesCVTermLookupTasklet implements Tasklet {
 		log.info("CV:" +cv);
 	}
 	
+	
+	private void populateCVTerms(final CV cv){
+		
+	}
+	
 	private void populateDBCVTermStockProperties(int dbId){
 		
 		List<String> cvTerms = MetadataExecutionContext.getInstance().getAllCvTermStockProperties();
@@ -138,7 +143,7 @@ public class StockPropertiesCVTermLookupTasklet implements Tasklet {
 		for (String item: cvTerms){
 			log.info("Stock CV Term: " + item);
 			
-			log.info("Loading Term to database");
+			log.info("Loading CV Term to database...");
 			
 			DbXref dbXref = new DbXref();
 			dbXref.setDbId(dbId);

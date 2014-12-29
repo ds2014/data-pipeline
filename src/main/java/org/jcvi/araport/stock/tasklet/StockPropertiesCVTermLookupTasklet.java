@@ -13,19 +13,22 @@ import javax.sql.DataSource;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.araport.jcvi.stock.application.DataSourceInfrastructureConfiguration;
-import org.araport.jcvi.stock.common.ApplicationContstants;
+import org.araport.jcvi.stock.common.ApplicationConstants;
 import org.araport.jcvi.stock.common.MetadataExecutionContext;
 import org.araport.jcvi.stock.exception.ExceptionLogger;
 import org.araport.jcvi.stock.exception.StockLoaderException;
 import org.araport.jcvi.stock.utils.FileUtils;
+import org.jcvi.araport.stock.dao.CVDao;
 import org.jcvi.araport.stock.dao.DbDao;
 import org.jcvi.araport.stock.dao.DbXRefDao;
 import org.jcvi.araport.stock.dao.OrganismDao;
 import org.jcvi.araport.stock.dao.StockDao;
+import org.jcvi.araport.stock.dao.impl.CVDaoImpl;
 import org.jcvi.araport.stock.dao.impl.DbDaoImpl;
 import org.jcvi.araport.stock.dao.impl.DbXrefDaoImpl;
 import org.jcvi.araport.stock.dao.impl.OrganismDaoImpl;
 import org.jcvi.araport.stock.dao.impl.StockDaoImpl;
+import org.jcvi.araport.stock.domain.CV;
 import org.jcvi.araport.stock.domain.Db;
 import org.jcvi.araport.stock.domain.DbXref;
 import org.omg.CORBA.portable.InputStream;
@@ -47,7 +50,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 @StepScope
-@Import({DataSourceInfrastructureConfiguration.class, DbDaoImpl.class, DbXrefDaoImpl.class, StockDaoImpl.class})
+@Import({DataSourceInfrastructureConfiguration.class, DbDaoImpl.class, DbXrefDaoImpl.class, StockDaoImpl.class, CVDaoImpl.class})
 @PropertySources(value = {@PropertySource("classpath:/sql/bootstrap/db_init_cvterm_stockproperties.sql")})
 public class StockPropertiesCVTermLookupTasklet implements Tasklet {
 
@@ -68,6 +71,8 @@ public class StockPropertiesCVTermLookupTasklet implements Tasklet {
 	private DbXRefDao dbXrefDao;
 	
 	private StockDao stockDao;
+	
+	private CVDao cvDao;
 			
 	@Override
 	public RepeatStatus execute(StepContribution step, ChunkContext context)
@@ -87,7 +92,7 @@ public class StockPropertiesCVTermLookupTasklet implements Tasklet {
 		log.info("Stock Term Database:" + stockTermDb);
 		
 		
-		populateLookups(stockTermDb.getDbId(), ApplicationContstants.CV_STOCK_PROPERTY_NAME);
+		populateLookups(stockTermDb.getDbId());
 		
 		return RepeatStatus.FINISHED;
 	}
@@ -99,18 +104,31 @@ public class StockPropertiesCVTermLookupTasklet implements Tasklet {
 		this.dbXrefDao.setDataSource(targetDataSource);
 		this.stockDao = new StockDaoImpl();
 		this.stockDao.setDataSource(targetDataSource);
+		this.cvDao = new CVDaoImpl();
+		this.cvDao.setDataSource(targetDataSource);
+		
 	}
 	
 	
-	private void populateLookups(int dbId, String name) {
+	private void populateLookups(int dbId) {
 		
-		populateCVLookup(name);
+		populateCVLookup();
 		populateDBCVTermStockProperties(dbId);
    
 	}
 	
-	private void populateCVLookup(String name){
+	private void populateCVLookup(){
 		
+		CV cv = new CV();
+		
+		cv.setName(ApplicationConstants.CV_STOCK_PROPERTY_NAME);
+		cv.setDefintion(ApplicationConstants.CV_STOCK_PROPERTY_DEFINITION);
+		
+		cvDao.merge(cv);
+		
+		cv = cvDao.mergeAndReturn(cv);
+		
+		log.info("CV:" +cv);
 	}
 	
 	private void populateDBCVTermStockProperties(int dbId){

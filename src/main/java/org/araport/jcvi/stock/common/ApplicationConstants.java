@@ -1,6 +1,6 @@
 package org.araport.jcvi.stock.common;
 
-public class ApplicationContstants {
+public class ApplicationConstants {
 
 	public final static String TAIR_DB_ID = "TAIR_DB_ID";
 	public final static String TAIR_DB_NAME = "TAIR";
@@ -10,6 +10,7 @@ public class ApplicationContstants {
 	
 	//Controlled vocabularies
 	public final static String CV_STOCK_PROPERTY_NAME = "stock_property";
+	public final static String CV_STOCK_PROPERTY_DEFINITION = "Contains properties for stocks.";
 	
 	//Stock properties
 	public final static String STOCK_AVAILABILITY = "stock_availability";

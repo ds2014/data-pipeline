@@ -1,7 +1,7 @@
 package org.jcvi.araport.stock.listeners;
 
 import org.apache.log4j.Logger;
-import org.araport.jcvi.stock.common.ApplicationContstants;
+import org.araport.jcvi.stock.common.ApplicationConstants;
 import org.araport.jcvi.stock.common.DbLookupHolder;
 import org.araport.jcvi.stock.common.MetadataExecutionContext;
 import org.springframework.batch.core.ExitStatus;
@@ -19,11 +19,11 @@ public class LogStepStartStopListener implements StepExecutionListener {
 
 	        ExecutionContext jobContext = execution.getJobExecution().getExecutionContext();
 	        
-	        if (jobContext.containsKey(ApplicationContstants.TAIR_DB_ID)){
-	        	 log.info(ApplicationContstants.TAIR_DB_ID + ": " + jobContext.get(ApplicationContstants.TAIR_DB_ID) );
+	        if (jobContext.containsKey(ApplicationConstants.TAIR_DB_ID)){
+	        	 log.info(ApplicationConstants.TAIR_DB_ID + ": " + jobContext.get(ApplicationConstants.TAIR_DB_ID) );
 	        }
-	        if (jobContext.containsKey(ApplicationContstants.TAIR_STOCK_DB_ID)){
-	        	 log.info(ApplicationContstants.TAIR_STOCK_DB_ID + ": " + jobContext.get(ApplicationContstants.TAIR_STOCK_DB_ID) );
+	        if (jobContext.containsKey(ApplicationConstants.TAIR_STOCK_DB_ID)){
+	        	 log.info(ApplicationConstants.TAIR_STOCK_DB_ID + ": " + jobContext.get(ApplicationConstants.TAIR_STOCK_DB_ID) );
 	        }
 	        
 	       return execution.getExitStatus();
@@ -38,14 +38,14 @@ public class LogStepStartStopListener implements StepExecutionListener {
 		
 		DbLookupHolder dbLookupHolder = new DbLookupHolder();
 		
-	  if (jobContext.containsKey(ApplicationContstants.TAIR_DB_ID)){
-       	 log.info(ApplicationContstants.TAIR_DB_ID + ": " + jobContext.get(ApplicationContstants.TAIR_DB_ID) );
-       	dbLookupHolder.setTairDBId((Integer)jobContext.get(ApplicationContstants.TAIR_DB_ID));
+	  if (jobContext.containsKey(ApplicationConstants.TAIR_DB_ID)){
+       	 log.info(ApplicationConstants.TAIR_DB_ID + ": " + jobContext.get(ApplicationConstants.TAIR_DB_ID) );
+       	dbLookupHolder.setTairDBId((Integer)jobContext.get(ApplicationConstants.TAIR_DB_ID));
        	     	
        }
-       if (jobContext.containsKey(ApplicationContstants.TAIR_STOCK_DB_ID)){
-       	 log.info(ApplicationContstants.TAIR_STOCK_DB_ID + ": " + jobContext.get(ApplicationContstants.TAIR_STOCK_DB_ID) );
-       	dbLookupHolder.setTairStockDBId((Integer)jobContext.get(ApplicationContstants.TAIR_STOCK_DB_ID));
+       if (jobContext.containsKey(ApplicationConstants.TAIR_STOCK_DB_ID)){
+       	 log.info(ApplicationConstants.TAIR_STOCK_DB_ID + ": " + jobContext.get(ApplicationConstants.TAIR_STOCK_DB_ID) );
+       	dbLookupHolder.setTairStockDBId((Integer)jobContext.get(ApplicationConstants.TAIR_STOCK_DB_ID));
        	 
        }
        

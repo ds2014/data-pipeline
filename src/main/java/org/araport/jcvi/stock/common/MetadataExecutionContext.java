@@ -86,30 +86,30 @@ public class MetadataExecutionContext {
 	private static void populatecvTermStockProperties() {
 
 		if (cvTermStockProperties.size() == 0) {
-			cvTermStockProperties.add(ApplicationContstants.IS_SEED);
-			cvTermStockProperties.add(ApplicationContstants.DATE_LAST_MODIFIED);
-			cvTermStockProperties.add(ApplicationContstants.FORMAT_RECEIVED);
-			cvTermStockProperties.add(ApplicationContstants.MEDIA);
-			cvTermStockProperties.add(ApplicationContstants.GROWTH_TEMPERATURE);
-			cvTermStockProperties.add(ApplicationContstants.DURATION_OF_GROWTH);
-			cvTermStockProperties.add(ApplicationContstants.FORMAT_SHIPPED);
-			cvTermStockProperties.add(ApplicationContstants.KIT_CONTENTS);
-			cvTermStockProperties.add(ApplicationContstants.RELEASE_DATE);
-			cvTermStockProperties.add(ApplicationContstants.NUMBER_IN_SET);
-			cvTermStockProperties.add(ApplicationContstants.BOX);
-			cvTermStockProperties.add(ApplicationContstants.POSITION);
-			cvTermStockProperties.add(ApplicationContstants.NUM_LINES);
-			cvTermStockProperties.add(ApplicationContstants.LOCATION);
-			cvTermStockProperties.add(ApplicationContstants.HAS_STOCK_NOTES);
-			cvTermStockProperties.add(ApplicationContstants.ABRC_COMMENTS);
-			cvTermStockProperties.add(ApplicationContstants.DATE_ENTERED);
+			cvTermStockProperties.add(ApplicationConstants.IS_SEED);
+			cvTermStockProperties.add(ApplicationConstants.DATE_LAST_MODIFIED);
+			cvTermStockProperties.add(ApplicationConstants.FORMAT_RECEIVED);
+			cvTermStockProperties.add(ApplicationConstants.MEDIA);
+			cvTermStockProperties.add(ApplicationConstants.GROWTH_TEMPERATURE);
+			cvTermStockProperties.add(ApplicationConstants.DURATION_OF_GROWTH);
+			cvTermStockProperties.add(ApplicationConstants.FORMAT_SHIPPED);
+			cvTermStockProperties.add(ApplicationConstants.KIT_CONTENTS);
+			cvTermStockProperties.add(ApplicationConstants.RELEASE_DATE);
+			cvTermStockProperties.add(ApplicationConstants.NUMBER_IN_SET);
+			cvTermStockProperties.add(ApplicationConstants.BOX);
+			cvTermStockProperties.add(ApplicationConstants.POSITION);
+			cvTermStockProperties.add(ApplicationConstants.NUM_LINES);
+			cvTermStockProperties.add(ApplicationConstants.LOCATION);
+			cvTermStockProperties.add(ApplicationConstants.HAS_STOCK_NOTES);
+			cvTermStockProperties.add(ApplicationConstants.ABRC_COMMENTS);
+			cvTermStockProperties.add(ApplicationConstants.DATE_ENTERED);
 			cvTermStockProperties
-					.add(ApplicationContstants.IS_CLASSICAL_MAPPING);
+					.add(ApplicationConstants.IS_CLASSICAL_MAPPING);
 			cvTermStockProperties
-					.add(ApplicationContstants.IS_MOLECULAR_MAPPING);
+					.add(ApplicationConstants.IS_MOLECULAR_MAPPING);
 			cvTermStockProperties
-					.add(ApplicationContstants.SPECIAL_GROWTH_CONDITIONS);
-			cvTermStockProperties.add(ApplicationContstants.IS_GERMPLASM);
+					.add(ApplicationConstants.SPECIAL_GROWTH_CONDITIONS);
+			cvTermStockProperties.add(ApplicationConstants.IS_GERMPLASM);
 			
 		
 		
@@ -117,17 +117,17 @@ public class MetadataExecutionContext {
 		
 		allcvTermStockProperties.addAll(cvTermStockProperties);
 		
-		allcvTermStockProperties.add(ApplicationContstants.HAS_FOREIGN_DNA);
-		allcvTermStockProperties.add(ApplicationContstants.HAS_POLYMORPHISMS);
-		allcvTermStockProperties.add(ApplicationContstants.IS_MUTANT);
-		allcvTermStockProperties.add(ApplicationContstants.IS_ANEPLOID);
+		allcvTermStockProperties.add(ApplicationConstants.HAS_FOREIGN_DNA);
+		allcvTermStockProperties.add(ApplicationConstants.HAS_POLYMORPHISMS);
+		allcvTermStockProperties.add(ApplicationConstants.IS_MUTANT);
+		allcvTermStockProperties.add(ApplicationConstants.IS_ANEPLOID);
 		allcvTermStockProperties
-				.add(ApplicationContstants.IS_ANEPLOID_CHROMOSOME);
-		allcvTermStockProperties.add(ApplicationContstants.IS_NATUTAL_VARIANT);
-		allcvTermStockProperties.add(ApplicationContstants.IS_MAPPINGL_STRAIN);
-		allcvTermStockProperties.add(ApplicationContstants.PLOIDY);
-		allcvTermStockProperties.add(ApplicationContstants.SPECIES_VARIANT_ID);
-		allcvTermStockProperties.add(ApplicationContstants.TAXON_ID);
+				.add(ApplicationConstants.IS_ANEPLOID_CHROMOSOME);
+		allcvTermStockProperties.add(ApplicationConstants.IS_NATUTAL_VARIANT);
+		allcvTermStockProperties.add(ApplicationConstants.IS_MAPPINGL_STRAIN);
+		allcvTermStockProperties.add(ApplicationConstants.PLOIDY);
+		allcvTermStockProperties.add(ApplicationConstants.SPECIES_VARIANT_ID);
+		allcvTermStockProperties.add(ApplicationConstants.TAXON_ID);
 		
 		}
 

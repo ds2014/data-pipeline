@@ -11,7 +11,7 @@ import javax.sql.DataSource;
 
 import org.apache.log4j.Logger;
 import org.araport.jcvi.stock.application.DataSourceInfrastructureConfiguration;
-import org.araport.jcvi.stock.common.ApplicationContstants;
+import org.araport.jcvi.stock.common.ApplicationConstants;
 import org.araport.jcvi.stock.common.MetadataExecutionContext;
 import org.jcvi.araport.stock.dao.DbDao;
 import org.jcvi.araport.stock.domain.Db;
@@ -102,7 +102,7 @@ public class DbDaoImpl implements DbDao {
     public void setTairDbId(){
     	
     	if (MetadataExecutionContext.getInstance().getTairDbId()==0){
-			Db tair_db = findDbByName(ApplicationContstants.TAIR_DB_NAME);
+			Db tair_db = findDbByName(ApplicationConstants.TAIR_DB_NAME);
 			MetadataExecutionContext.getInstance().setTairDbId(tair_db.getDbId());
 		}
 		
@@ -111,7 +111,7 @@ public class DbDaoImpl implements DbDao {
     public void setTairStockDb(){
     	
     	if (MetadataExecutionContext.getInstance().getTairStockDbId()==0){
-			Db tair_stock_db =  findDbByName(ApplicationContstants.TAIR_STOCK_DB_NAME);
+			Db tair_stock_db =  findDbByName(ApplicationConstants.TAIR_STOCK_DB_NAME);
 			MetadataExecutionContext.getInstance().setTairStockDbId(tair_stock_db.getDbId());
 		}
     }

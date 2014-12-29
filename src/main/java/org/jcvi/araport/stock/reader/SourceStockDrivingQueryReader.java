@@ -4,7 +4,7 @@ import javax.sql.DataSource;
 
 import org.apache.log4j.Logger;
 import org.araport.jcvi.stock.application.DataSourceInfrastructureConfiguration;
-import org.araport.jcvi.stock.common.ApplicationContstants;
+import org.araport.jcvi.stock.common.ApplicationConstants;
 import org.araport.jcvi.stock.common.DbLookupHolder;
 import org.araport.jcvi.stock.common.MetadataExecutionContext;
 import org.jcvi.araport.stock.dao.impl.DbDaoImpl;

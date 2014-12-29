@@ -5,7 +5,7 @@ import javax.sql.DataSource;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.araport.jcvi.stock.application.DataSourceInfrastructureConfiguration;
-import org.araport.jcvi.stock.common.ApplicationContstants;
+import org.araport.jcvi.stock.common.ApplicationConstants;
 import org.araport.jcvi.stock.common.DbLookupHolder;
 import org.araport.jcvi.stock.common.MetadataExecutionContext;
 import org.jcvi.araport.stock.dao.DbDao;
@@ -47,11 +47,11 @@ public class DbLookupTasklet implements Tasklet {
         dbDao.setTairDbId();
         dbDao.setTairStockDb();
         
-       	saveDbLookups(ApplicationContstants.TAIR_DB_ID, dbDao.getTairDBId(), jobContext);
-		saveDbLookups(ApplicationContstants.TAIR_STOCK_DB_ID, dbDao.getTairStockDbId(), jobContext);
+       	saveDbLookups(ApplicationConstants.TAIR_DB_ID, dbDao.getTairDBId(), jobContext);
+		saveDbLookups(ApplicationConstants.TAIR_STOCK_DB_ID, dbDao.getTairStockDbId(), jobContext);
 		
-		log.info(ApplicationContstants.TAIR_DB_ID + ": " + dbDao.getTairStockDbId());
-		log.info(ApplicationContstants.TAIR_STOCK_DB_ID + ": " + dbDao.getTairStockDbId());
+		log.info(ApplicationConstants.TAIR_DB_ID + ": " + dbDao.getTairStockDbId());
+		log.info(ApplicationConstants.TAIR_STOCK_DB_ID + ": " + dbDao.getTairStockDbId());
 		return RepeatStatus.FINISHED;
 	}
 

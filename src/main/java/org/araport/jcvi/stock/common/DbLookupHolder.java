@@ -9,19 +9,19 @@ public class DbLookupHolder {
 	
  
 	public int getTairDBId() {
-		return dbLookup.get(ApplicationContstants.TAIR_DB_ID);
+		return dbLookup.get(ApplicationConstants.TAIR_DB_ID);
 	}
 	
 	public void setTairDBId(int dbId) {
-			dbLookup.put(ApplicationContstants.TAIR_DB_ID, dbId);
+			dbLookup.put(ApplicationConstants.TAIR_DB_ID, dbId);
 	}
 
 	public int getTairStockDBId() {
-		return dbLookup.get(ApplicationContstants.TAIR_STOCK_DB_ID);
+		return dbLookup.get(ApplicationConstants.TAIR_STOCK_DB_ID);
 	}
 	
 	public void setTairStockDBId(int dbId) {
-		dbLookup.put(ApplicationContstants.TAIR_STOCK_DB_ID, dbId);
+		dbLookup.put(ApplicationConstants.TAIR_STOCK_DB_ID, dbId);
 }
 		
 }

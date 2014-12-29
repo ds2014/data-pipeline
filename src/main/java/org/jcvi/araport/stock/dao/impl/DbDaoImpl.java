@@ -9,6 +9,8 @@ import javax.sql.DataSource;
 
 import org.apache.log4j.Logger;
 import org.araport.jcvi.stock.application.DataSourceInfrastructureConfiguration;
+import org.araport.jcvi.stock.common.ApplicationContstants;
+import org.araport.jcvi.stock.common.MetadataExecutionContext;
 import org.jcvi.araport.stock.dao.DbDao;
 import org.jcvi.araport.stock.domain.Db;
 import org.jcvi.araport.stock.processor.DbXrefItemProcessor;
@@ -43,6 +45,9 @@ public class DbDaoImpl implements DbDao {
 		Map<String, Object> params = new HashMap<String, Object>();
 		params.put("name", name);
 
+		log.info("Metadata: TAIR Db Id " + MetadataExecutionContext.getInstance().getTairDbId());
+		log.info("Metadata: TAIR Stock Db Id " + MetadataExecutionContext.getInstance().getTairStockDbId());
+		
 		log.info("Find Db By Name Parameter ="
 				+ name);
 
@@ -67,8 +72,46 @@ public class DbDaoImpl implements DbDao {
 	public void setDataSource() {
 		this.namedParameterJdbcTemplate = new NamedParameterJdbcTemplate(
 				targetDataSource);
+	
+		setTairDbId();
+		
+		setTairStockDb();
+		
+		
 	}
 
+    public int getTairDBId(){
+    	
+    	setTairDbId();
+    	
+    	return MetadataExecutionContext.getInstance().getTairDbId();
+    }
+    
+    public int getTairStockDbId(){
+    	
+    	setTairStockDb();
+    	
+    	return MetadataExecutionContext.getInstance().getTairStockDbId();
+    }
+	
+    
+    public void setTairDbId(){
+    	
+    	if (MetadataExecutionContext.getInstance().getTairDbId()==0){
+			Db tair_db = findDbByName(ApplicationContstants.TAIR_DB_NAME);
+			MetadataExecutionContext.getInstance().setTairDbId(tair_db.getDbId());
+		}
+		
+    }
+    
+    public void setTairStockDb(){
+    	
+    	if (MetadataExecutionContext.getInstance().getTairStockDbId()==0){
+			Db tair_stock_db =  findDbByName(ApplicationContstants.TAIR_STOCK_DB_NAME);
+			MetadataExecutionContext.getInstance().setTairStockDbId(tair_stock_db.getDbId());
+		}
+    }
+    
 	public DbRowMapper dbRowMapper() {
 		return new DbRowMapper();
 	}

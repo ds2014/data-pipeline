@@ -18,6 +18,9 @@ import org.jcvi.araport.stock.domain.DbXref;
 import org.jcvi.araport.stock.domain.Organism;
 import org.jcvi.araport.stock.domain.SourceStockDrivingQuery;
 import org.jcvi.araport.stock.writer.DbXrefItemWriter;
+import org.springframework.batch.core.StepExecution;
+import org.springframework.batch.core.listener.StepExecutionListenerSupport;
+import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Import;
@@ -41,8 +44,8 @@ public class StockItemProcessor implements ItemProcessor <SourceStockDrivingQuer
 
 	private static final Logger log = Logger
 			.getLogger(StockItemProcessor.class);
-
 	
+			
 	@Override
 	public Stock process(SourceStockDrivingQuery sourceRecord) throws Exception {
 		
@@ -106,4 +109,6 @@ public class StockItemProcessor implements ItemProcessor <SourceStockDrivingQuer
 		this.stockDao = new StockDaoImpl();
 		this.stockDao.setDataSource(targetDataSource);
 	}
-}
+	
+		
+	}

@@ -27,4 +27,6 @@ public class RowMapperBeans {
 	public StockItemWriter stockItemWriter(){
 		return new StockItemWriter();
 	}
+	
+	
 }

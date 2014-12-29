@@ -9,7 +9,10 @@ import org.jcvi.araport.stock.reader.DbXrefItemReader;
 import org.jcvi.araport.stock.reader.SourceStockDrivingQueryReader;
 import org.jcvi.araport.stock.rowmapper.DbXrefRowMapper;
 import org.jcvi.araport.stock.rowmapper.beans.RowMapperBeans;
+import org.jcvi.araport.stock.tasklet.DbLookupTasklet;
+
 import org.jcvi.araport.stock.writer.DbXrefItemWriter;
+import org.jcvi.araport.stock.domain.Db;
 import org.jcvi.araport.stock.domain.DbXref;
 import org.jcvi.araport.stock.domain.SourceStockDrivingQuery;
 import org.jcvi.araport.stock.domain.Stock;
@@ -47,14 +50,26 @@ import org.springframework.transaction.PlatformTransactionManager;
 
 @Configuration
 @EnableBatchProcessing
-@Import({DataSourceInfrastructureConfiguration.class,DbXrefItemReader.class, SourceStockDrivingQueryReader.class, RowMapperBeans.class, TaskExecutorConfig.class})
+@Import({DataSourceInfrastructureConfiguration.class,DbXrefItemReader.class, SourceStockDrivingQueryReader.class, RowMapperBeans.class, TaskExecutorConfig.class, DbLookupTasklet.class})
 public class LoadStocksJobBatchConfiguration {
 
+	public static final String STOCK_MASTER_LOADING_STEP = "stockMasterLoadingStep";
+	public static final String DB_LOOKUP_LOADING_STEP = "dbLookupLoadingStep";
+	public static final String STOCK_CROSSREFERENCES_LOADING_STEP = "stockCrossReferencesLoadingStep";
+	public static final String STOCK_PROPERTIES_LOADING_STEP = "stockPropertiesLoadingStep";
+	public static final String GERMPLASM_MASTER_LOADING_STEP = "germplasmMasterLoadingStep";
+	
 	@Autowired
 	private Environment env;
 	
 	@Autowired
     private JobBuilderFactory jobs;
+	
+	@Autowired
+    private JobBuilderFactory jobBuilders;
+	
+	@Autowired
+    protected StepBuilderFactory stepBuilders;
  
     @Autowired
     private StepBuilderFactory stepBuilderFactory;
@@ -73,7 +88,8 @@ public class LoadStocksJobBatchConfiguration {
     
     @Autowired
     private TaskExecutor taskExecutor;
-         
+    
+            
 	
 	//@Autowired
 	//JobLauncher jobLauncher;
@@ -113,9 +129,12 @@ public class LoadStocksJobBatchConfiguration {
 	// tag::jobstep[]
 	@Bean
 	public Job loadStocks(){
-		return jobs.get("loadStocks")
+		return jobs.get("STOCK_MASTER_LOADING_STEP")
 				.listener(protocolListener())
-				.start(step())
+				//.start(stockMasterLoadingStep())
+				//.next(dbLookupLoadingStep())
+				.start(dbLookupLoadingStep())
+				.next(stockMasterLoadingStep())
 				.build();
 	}	
 	
@@ -151,26 +170,39 @@ public class LoadStocksJobBatchConfiguration {
 	}
 	*/
 	
+	
 	@Bean
-	public Step step(){
-		return stepBuilderFactory.get("step").listener(stepStartStopListener())
-				.<SourceStockDrivingQuery,Stock>chunk(100) //important to be one in this case to commit after every line read
+    public Step stockMasterLoadingStep() {
+        return stepBuilders
+                .get(STOCK_MASTER_LOADING_STEP)
+                .listener(stepStartStopListener())
+                .<SourceStockDrivingQuery,Stock>chunk(100) //important to be one in this case to commit after every line read
 				//.reader(dbXRefReader())
 				.reader(sourceStockReader)
 				.processor(stockItemProcessor)
 				.writer(stockItemWriter).taskExecutor(taskExecutor).throttleLimit(2)
 				.listener(logProcessListener())
-			   // .faultTolerant()
+				 // .faultTolerant()
 				.build();
-	}
+    }
 	
-	// end::jobstep[]
+	@Bean
+    public Step dbLookupLoadingStep() {
+        return stepBuilders
+                .get(DB_LOOKUP_LOADING_STEP)
+                .tasklet(dbLookupTasklet())
+				.build();
+    }
 	
 	 @Bean
 	    public ItemWriter<DbXref> writer() {
 	    	return new DbXrefItemWriter();
 	    }
 	 
+	 @Bean
+	 public DbLookupTasklet dbLookupTasklet(){
+		 return new DbLookupTasklet();
+	 }
 	
 	/** configure the processor related stuff */
 	 

@@ -42,7 +42,7 @@ public class StockItemWriter implements ItemWriter<Stock> {
 			
 		for (Stock item : items)  {
 			
-			System.out.println("Stock To Write= " + item);
+			log.info("Stock To Write= " + item);
 			stockDao.merge(item);
 		}
 		

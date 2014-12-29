@@ -8,5 +8,9 @@ public interface DbDao {
 	public Db findDbByName(String name);
 	public boolean save(Db db);
 	
+	public int getTairDBId();
+	public int getTairStockDbId();
+	public void setTairDbId();
+	public void setTairStockDb();
 	
 }

@@ -41,18 +41,18 @@ public class DbXrefDaoImpl implements DbXRefDao {
 			.getLogger(DbXrefDaoImpl.class);
 	
 	private final String FIND_BY_ACCESSION_AND_DB_SQL = "select dbxref_id, db_id, accession, version, description from chado.dbxref where db_id =:db_id and accession =:accession";
-    private final String UPDATE_SQL = "UPDATE chado.dbxref t SET db_id =:db_id, accession =:accession, version = :version, " +
+    private final String UPDATE_SQL_BY_DB_ACCESSION = "UPDATE chado.dbxref t SET db_id =:db_id, accession =:accession, version = :version, " +
     		"description =:description " +
     		"WHERE 	t.db_id =:db_id AND " + 
     		"t.accession =:accession";
     
-    private final String INSERT_SQL = "INSERT INTO chado.dbxref (db_id, accession, version, description) " +
+    private final String INSERT_SQLBY_DB_ACCESSION = "INSERT INTO chado.dbxref (db_id, accession, version, description) " +
 "VALUES (:db_id, :accession, :version, :description)";
     
-    private final String INSERT_SQL_RETURN_KEY = "INSERT INTO chado.dbxref (db_id, accession, version, description) " +
+    private final String INSERT_SQL_BY_DB_ACCESSION_RETURN_KEY = "INSERT INTO chado.dbxref (db_id, accession, version, description) " +
 			 "VALUES (?, ?, ?, ?)";
     
-    private final String UPDATE_SQL_RETURN_KEY = "UPDATE chado.dbxref t SET db_id =?, accession=?, version =?, " +
+    private final String UPDATE_SQL_BY_DB_ACCESSION_RETURN_KEY = "UPDATE chado.dbxref t SET db_id =?, accession=?, version =?, " +
     		"description=? " +
     		"WHERE 	t.db_id=? AND " + 
     		"t.accession=?";
@@ -100,10 +100,10 @@ public class DbXrefDaoImpl implements DbXRefDao {
 		params.put("version", dbXref.getVersion());
 		params.put("description", dbXref.getDescription());
 			
-		int updatedCount = namedParameterJdbcTemplate.update(UPDATE_SQL, params);
+		int updatedCount = namedParameterJdbcTemplate.update(UPDATE_SQL_BY_DB_ACCESSION, params);
 		
 		if (updatedCount == 0){ //perform insert
-			namedParameterJdbcTemplate.update(INSERT_SQL, params);
+			namedParameterJdbcTemplate.update(INSERT_SQLBY_DB_ACCESSION, params);
 		}
 			
 	}
@@ -141,7 +141,7 @@ public class DbXrefDaoImpl implements DbXRefDao {
 	        public PreparedStatement createPreparedStatement(
 	            Connection connection) throws SQLException {
 	                PreparedStatement ps = connection.prepareStatement(
-	                		UPDATE_SQL_RETURN_KEY, new String[] { "dbxref_id" });
+	                		UPDATE_SQL_BY_DB_ACCESSION_RETURN_KEY, new String[] { "dbxref_id" });
 	                
 	                ps.setInt(1, dbXref.getDbId());
 	                ps.setString(2,dbXref.getPrimaryAccession());
@@ -159,7 +159,7 @@ public class DbXrefDaoImpl implements DbXRefDao {
 		        public PreparedStatement createPreparedStatement(
 		            Connection connection) throws SQLException {
 		                PreparedStatement ps = connection.prepareStatement(
-		                		INSERT_SQL_RETURN_KEY, new String[] { "dbxref_id" });
+		                		INSERT_SQL_BY_DB_ACCESSION_RETURN_KEY, new String[] { "dbxref_id" });
 		                
 		                ps.setInt(1, dbXref.getDbId());
 		                ps.setString(2,dbXref.getPrimaryAccession());

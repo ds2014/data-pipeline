@@ -5,6 +5,7 @@ import java.io.DataInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.List;
 
 import javax.annotation.PostConstruct;
 import javax.sql.DataSource;
@@ -12,6 +13,10 @@ import javax.sql.DataSource;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.araport.jcvi.stock.application.DataSourceInfrastructureConfiguration;
+import org.araport.jcvi.stock.common.ApplicationContstants;
+import org.araport.jcvi.stock.common.MetadataExecutionContext;
+import org.araport.jcvi.stock.exception.ExceptionLogger;
+import org.araport.jcvi.stock.exception.StockLoaderException;
 import org.araport.jcvi.stock.utils.FileUtils;
 import org.jcvi.araport.stock.dao.DbDao;
 import org.jcvi.araport.stock.dao.DbXRefDao;
@@ -21,6 +26,8 @@ import org.jcvi.araport.stock.dao.impl.DbDaoImpl;
 import org.jcvi.araport.stock.dao.impl.DbXrefDaoImpl;
 import org.jcvi.araport.stock.dao.impl.OrganismDaoImpl;
 import org.jcvi.araport.stock.dao.impl.StockDaoImpl;
+import org.jcvi.araport.stock.domain.Db;
+import org.jcvi.araport.stock.domain.DbXref;
 import org.omg.CORBA.portable.InputStream;
 import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.configuration.annotation.StepScope;
@@ -65,14 +72,23 @@ public class StockPropertiesCVTermLookupTasklet implements Tasklet {
 	@Override
 	public RepeatStatus execute(StepContribution step, ChunkContext context)
 			throws Exception {
-		String sql = environment
-		.getProperty("db.cvterm.sql");
 		
-		sql = FileUtils.getSqlFileContents("/sql/bootstrap/db_init_cvterm_stockproperties.sql");
-
-		log.info("Injected SQL:" + sql);
+			
+		String sql = FileUtils.getSqlFileContents("/sql/bootstrap/db_init_cvterm_stockproperties.sql");
+			log.info("Injected SQL:" + sql);
+	    dbDao.executeSQL(sql);
 		
-		dbDao.executeSQL(sql);
+		Db stockTermDb = dbDao.findDbByName("stock term");
+		
+		if (stockTermDb == null){
+			throw new StockLoaderException("Database with name stock_term not ! Cannot load stock properties cvterms data.");
+		}
+		
+		log.info("Stock Term Database:" + stockTermDb);
+		
+		
+		populateLookups(stockTermDb.getDbId(), ApplicationContstants.CV_STOCK_PROPERTY_NAME);
+		
 		return RepeatStatus.FINISHED;
 	}
 	
@@ -83,6 +99,42 @@ public class StockPropertiesCVTermLookupTasklet implements Tasklet {
 		this.dbXrefDao.setDataSource(targetDataSource);
 		this.stockDao = new StockDaoImpl();
 		this.stockDao.setDataSource(targetDataSource);
+	}
+	
+	
+	private void populateLookups(int dbId, String name) {
+		
+		populateCVLookup(name);
+		populateDBCVTermStockProperties(dbId);
+   
+	}
+	
+	private void populateCVLookup(String name){
+		
+	}
+	
+	private void populateDBCVTermStockProperties(int dbId){
+		
+		List<String> cvTerms = MetadataExecutionContext.getInstance().getAllCvTermStockProperties();
+		
+		for (String item: cvTerms){
+			log.info("Stock CV Term: " + item);
+			
+			log.info("Loading Term to database");
+			
+			DbXref dbXref = new DbXref();
+			dbXref.setDbId(dbId);
+			dbXref.setPrimaryAccession(item);
+			dbXref.setVersion("");
+			dbXref.setDescription("");
+			
+			dbXref = dbXrefDao.mergeAndReturn(dbXref);
+			
+			log.info("Loaded DbXref: " + dbXref);
+			
+			
+		}
+		
 	}
 		
 }

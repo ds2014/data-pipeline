@@ -55,8 +55,7 @@ public class ApplicationLauncher {
 
 		Job stockReader = ctx.getBean(LOAD_STOCKS, Job.class);
 
-		JobParameters jobParameters = new JobParametersBuilder().addDate(
-				"date", new Date()).toJobParameters();
+		JobParameters jobParameters = new JobParametersBuilder().addLong("time",System.currentTimeMillis()).toJobParameters();
 
 		JobExecution jobExecution = jobLauncher.run(stockReader, jobParameters);
 

@@ -4,13 +4,14 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class MetadataExecutionContext {
 
 	private static DbLookupHolder dbLookupHolder;
 	private static int tairDbId;
 	private static int tairStockDbId;
-	private static Map<String, String> cvTermStockLookup = new HashMap<String, String>();
+	private static Map<String, String> cvTermStockLookup = new ConcurrentHashMap<String, String>();
 	private static Map<String, String> allCvTermStockLookup = new HashMap<String, String>();
 	private static List<String> cvTermStockProperties = new ArrayList<String>();
 	private static List<String> allcvTermStockProperties = new ArrayList<String>();

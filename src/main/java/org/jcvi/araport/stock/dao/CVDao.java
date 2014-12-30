@@ -9,7 +9,7 @@ import org.jcvi.araport.stock.domain.DbXref;
 public interface CVDao {
 
 	public boolean create (CV cv);
-	public Db findDbByName(String name);
+	public CV findDbByName(String name);
 	public boolean save(CV cv);
 	
 	public void merge(CV cv);

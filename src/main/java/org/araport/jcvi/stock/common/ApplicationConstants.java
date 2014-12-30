@@ -9,6 +9,7 @@ public class ApplicationConstants {
 	public final static String TAIR_STOCK_DB_NAME = "TAIR Stock";
 	
 	//Controlled vocabularies
+	public final static String CV_STOCK_DB_NAME = "stock term";
 	public final static String CV_STOCK_PROPERTY_NAME = "stock_property";
 	public final static String CV_STOCK_PROPERTY_DEFINITION = "Contains properties for stocks.";
 	

@@ -1,9 +1,7 @@
 package org.jcvi.araport.stock.dao.impl;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.annotation.PostConstruct;
@@ -12,33 +10,28 @@ import javax.sql.DataSource;
 import org.apache.log4j.Logger;
 import org.araport.jcvi.stock.application.DataSourceInfrastructureConfiguration;
 import org.araport.jcvi.stock.utils.FileUtils;
-import org.jcvi.araport.stock.dao.CVDao;
-import org.jcvi.araport.stock.domain.CV;
-import org.jcvi.araport.stock.domain.Db;
-import org.jcvi.araport.stock.rowmapper.CVRowMapper;
-import org.jcvi.araport.stock.rowmapper.DbXrefRowMapper;
+import org.jcvi.araport.stock.dao.CVTermDao;
+import org.jcvi.araport.stock.domain.CVTerm;
+import org.jcvi.araport.stock.rowmapper.CVTermRowMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Import;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.PreparedStatementCreator;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcOperations;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
-import org.springframework.jdbc.support.GeneratedKeyHolder;
-import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Repository;
 
 
-@Component("cv_dao")
+@Component("cv_term_dao")
 @Repository
 @Import({ DataSourceInfrastructureConfiguration.class })
-public class CVDaoImpl implements CVDao {
+public class CVTermDaoImpl implements CVTermDao{
 
 	@Autowired
 	DataSource targetDataSource;
 	
-	private static final String INSERT_NAMED_PARAM_SQL_PATH = "/sql/bootstrap/cv/insert_cv_stock_property_namedparams.sql";
-	private static final String UPDATE_NAMED_PARAM_SQL_PATH = "/sql/bootstrap/cv/update_cv_stock_property_namedparams.sql";
+	private static final String INSERT_NAMED_PARAM_SQL_PATH = "/sql/bootstrap/cvterm/insert_cvterm_property_namedparams.sql";
+	private static final String UPDATE_NAMED_PARAM_SQL_PATH = "/sql/bootstrap/cvterm/update_cvterm_property_namedparams.sql";
 	
 	private static final String INSERT_NONAMED_PARAM_SQL_PATH = "/sql/bootstrap/cv/insert_cv_stock_property_nonamedparams.sql";
 	private static final String UPDATE_NONAMED_PARAM_SQL_PATH = "/sql/bootstrap/cv/update_cv_stock_property_nonamedparams.sql";
@@ -54,36 +47,64 @@ public class CVDaoImpl implements CVDao {
 	private JdbcTemplate jdbcTemplate;
 	
 	private static final Logger log = Logger
-			.getLogger(CVDaoImpl.class);
+			.getLogger(CVTermDaoImpl.class);
 	
 	@Override
-	public boolean create(CV cv) {
+	public boolean create(CVTerm cv) {
 		// TODO Auto-generated method stub
 		return false;
 	}
 
 	@Override
-	public CV findDbByName(String name) {
+	public CVTerm findByCVTermNameCVNameAndDbName(String cvTermName,
+			String cvName, String dbName) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public boolean save(CV cv) {
+	public List<CVTerm> findByCvIdAndDbId(int cvId, int dbId) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public List<CVTerm> findByCvIdAndDbName(int cvId, String dbName) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public List<CVTerm> findByCvNameAndDbId(String cvName, int dbId) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public List<CVTerm> findByCvNameAndDbName(String cvName, String dbName) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public boolean save(CVTerm cvTerm) {
 		// TODO Auto-generated method stub
 		return false;
 	}
 
 	@Override
-	public void merge(CV cv) {
-		
+	public void merge(CVTerm cvTerm) {
 		log.info("Insert SQL Named Params: " + INSERT_NAMED_PARAM_SQL);
 		log.info("Update SQL Named Params: " + UPDATE_NAMED_PARAM_SQL);
 		
 		Map<String, Object> params = new HashMap<String, Object>();
-		params.put("name", cv.getName());
-		params.put("definition", cv.getDefintion());
-					
+		params.put("cv_id", cvTerm.getCvId());
+		params.put("name", cvTerm.getName());
+		params.put("definition", cvTerm.getDefinition());
+		params.put("dbxref_id", cvTerm.getDbXrefId());
+		params.put("is_obsolete", cvTerm.getIs_obsolete());
+		params.put("is_relationshiptype", cvTerm.getIs_relationshiptype());
+		
 		int updatedCount = namedParameterJdbcTemplate.update(UPDATE_NAMED_PARAM_SQL, params);
 		int insertedCount = 0;
 		
@@ -94,58 +115,14 @@ public class CVDaoImpl implements CVDao {
 		log.info("Total Row Count Updated:" + updatedCount);
 		log.info("Total Row Count Inserted:" + insertedCount);
 		
-		
 	}
 
 	@Override
-	public CV mergeAndReturn(final CV cv) {
-		
-		log.info("Insert SQL No Named Params: " + INSERT_NONAMED_PARAM_SQL);
-		log.info("Update SQL No Named Params: " + UPDATE_NONAMED_PARAM_SQL);
-		
-		KeyHolder keyHolder = new GeneratedKeyHolder();
-		int updatedCount = jdbcTemplate.update(new PreparedStatementCreator() {
-	        public PreparedStatement createPreparedStatement(
-	            Connection connection) throws SQLException {
-	                PreparedStatement ps = connection.prepareStatement(
-	                		UPDATE_NONAMED_PARAM_SQL, new String[] { "cv_id" });
-	                
-	                ps.setString(1, cv.getName());
-	                ps.setString(2, cv.getDefintion());
-	                ps.setString(3, cv.getName());
-	                
-	                
-	                
-	                return ps;
-	            }
-	        }, keyHolder);
-		
-		int insertedCount = 0;
-		if (updatedCount == 0){
-			insertedCount = jdbcTemplate.update(new PreparedStatementCreator() {
-			        public PreparedStatement createPreparedStatement(
-			            Connection connection) throws SQLException {
-			                PreparedStatement ps = connection.prepareStatement(
-			                		INSERT_NONAMED_PARAM_SQL, new String[] { "dbxref_id" });
-			                
-			                ps.setString(1, cv.getName());
-			                ps.setString(2, cv.getDefintion());
-			                		                
-			                return ps;
-			            }
-			        }, keyHolder);
-		   }
-			log.info("CV Primary Key generated :" + keyHolder.getKey().intValue());
-		
-			CV createdCV = new CV();
-				createdCV.setCvId(keyHolder.getKey().intValue());
-				createdCV.setName(cv.getName());
-				createdCV.setDefintion(cv.getDefintion());
-				
-		return createdCV;
+	public CVTerm mergeAndReturn(CVTerm cvTerm) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
-		
 	@PostConstruct
 	public void setDataSource() {
 		this.namedParameterJdbcTemplate = new NamedParameterJdbcTemplate(
@@ -154,8 +131,8 @@ public class CVDaoImpl implements CVDao {
 			
 	}
 
-	public CVRowMapper rowMapper() {
-		return new CVRowMapper();
+	public CVTermRowMapper rowMapper() {
+		return new CVTermRowMapper();
 	}
 
 	@Override
@@ -166,5 +143,5 @@ public class CVDaoImpl implements CVDao {
 		
 		
 	}
-	
+
 }

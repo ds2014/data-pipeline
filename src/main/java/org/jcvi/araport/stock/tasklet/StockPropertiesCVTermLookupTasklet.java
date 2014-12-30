@@ -19,16 +19,19 @@ import org.araport.jcvi.stock.exception.ExceptionLogger;
 import org.araport.jcvi.stock.exception.StockLoaderException;
 import org.araport.jcvi.stock.utils.FileUtils;
 import org.jcvi.araport.stock.dao.CVDao;
+import org.jcvi.araport.stock.dao.CVTermDao;
 import org.jcvi.araport.stock.dao.DbDao;
 import org.jcvi.araport.stock.dao.DbXRefDao;
 import org.jcvi.araport.stock.dao.OrganismDao;
 import org.jcvi.araport.stock.dao.StockDao;
 import org.jcvi.araport.stock.dao.impl.CVDaoImpl;
+import org.jcvi.araport.stock.dao.impl.CVTermDaoImpl;
 import org.jcvi.araport.stock.dao.impl.DbDaoImpl;
 import org.jcvi.araport.stock.dao.impl.DbXrefDaoImpl;
 import org.jcvi.araport.stock.dao.impl.OrganismDaoImpl;
 import org.jcvi.araport.stock.dao.impl.StockDaoImpl;
 import org.jcvi.araport.stock.domain.CV;
+import org.jcvi.araport.stock.domain.CVTerm;
 import org.jcvi.araport.stock.domain.Db;
 import org.jcvi.araport.stock.domain.DbXref;
 import org.omg.CORBA.portable.InputStream;
@@ -50,114 +53,132 @@ import org.springframework.stereotype.Component;
 
 @Component
 @StepScope
-@Import({DataSourceInfrastructureConfiguration.class, DbDaoImpl.class, DbXrefDaoImpl.class, StockDaoImpl.class, CVDaoImpl.class})
-@PropertySources(value = {@PropertySource("classpath:/sql/bootstrap/db_init_cvterm_stockproperties.sql")})
+@Import({ DataSourceInfrastructureConfiguration.class, DbDaoImpl.class,
+		DbXrefDaoImpl.class, StockDaoImpl.class, CVDaoImpl.class, CVTermDaoImpl.class })
+@PropertySources(value = { @PropertySource("classpath:/sql/bootstrap/db_init_cvterm_stockproperties.sql") })
 public class StockPropertiesCVTermLookupTasklet implements Tasklet {
 
-	private static final Log log = LogFactory.getLog(StockPropertiesCVTermLookupTasklet.class);
+	private static final Log log = LogFactory
+			.getLog(StockPropertiesCVTermLookupTasklet.class);
 
 	@Autowired
 	Environment environment;
-	
+
 	@Autowired
 	private ResourceLoader resourceLoader;
-	
+
 	@Autowired
 	DataSource targetDataSource;
-	
+
 	@Autowired
 	private DbDao dbDao;
-	
+
 	private DbXRefDao dbXrefDao;
-	
+
 	private StockDao stockDao;
-	
+
 	private CVDao cvDao;
-			
+	
+	private CVTermDao cvTermDao;
+
 	@Override
 	public RepeatStatus execute(StepContribution step, ChunkContext context)
 			throws Exception {
-		
-			
-		String sql = FileUtils.getSqlFileContents("/sql/bootstrap/db_init_cvterm_stockproperties.sql");
-			log.info("Injected SQL:" + sql);
-	    dbDao.executeSQL(sql);
-		
+
+		String sql = FileUtils
+				.getSqlFileContents("/sql/bootstrap/db_init_cvterm_stockproperties.sql");
+		log.info("Injected SQL:" + sql);
+		dbDao.executeSQL(sql);
+
 		Db stockTermDb = dbDao.findDbByName("stock term");
-		
-		if (stockTermDb == null){
-			throw new StockLoaderException("Database with name stock_term not ! Cannot load stock properties cvterms data.");
+
+		if (stockTermDb == null) {
+			throw new StockLoaderException(
+					"Database with name stock_term not ! Cannot load stock properties cvterms data.");
 		}
-		
+
 		log.info("Stock Term Database:" + stockTermDb);
-		
-		
+
 		populateLookups(stockTermDb.getDbId());
-		
+
 		return RepeatStatus.FINISHED;
 	}
-	
-	
+
 	@PostConstruct
-	public void setDao(){
+	public void setDao() {
 		this.dbXrefDao = new DbXrefDaoImpl();
 		this.dbXrefDao.setDataSource(targetDataSource);
 		this.stockDao = new StockDaoImpl();
 		this.stockDao.setDataSource(targetDataSource);
 		this.cvDao = new CVDaoImpl();
 		this.cvDao.setDataSource(targetDataSource);
+		this.cvTermDao = new CVTermDaoImpl();
+		this.cvTermDao.setDataSource(targetDataSource);
 		
+
 	}
-	
-	
+
 	private void populateLookups(int dbId) {
-		
-		populateCVLookup();
-		populateDBCVTermStockProperties(dbId);
-   
-	}
-	
-	private void populateCVLookup(){
-		
+
 		CV cv = new CV();
-		
+		cv = populateCVLookup();
+		populateDBCVTermStockProperties(dbId, cv);
+
+	}
+
+	private CV populateCVLookup() {
+
+		CV cv = new CV();
+
 		cv.setName(ApplicationConstants.CV_STOCK_PROPERTY_NAME);
 		cv.setDefintion(ApplicationConstants.CV_STOCK_PROPERTY_DEFINITION);
-		
+
 		cvDao.merge(cv);
-		
+
 		cv = cvDao.mergeAndReturn(cv);
+
+		log.info("CV:" + cv);
 		
-		log.info("CV:" +cv);
+		return cv;
 	}
-	
-	
-	private void populateCVTerms(final CV cv){
+
+	private void addCVTerm(final CV cv, final DbXref dbXref, final String name) {
+
+		CVTerm cvTerm = new CVTerm();
+		cvTerm.setCvId(cv.getCvId());
+		cvTerm.setDbXrefId(dbXref.getDbXrefId());
+		cvTerm.setName(name);
+		cvTerm.setIs_obsolete(0);
+		cvTerm.setIs_relationshiptype(0);
 		
+		cvTermDao.merge(cvTerm);
+
 	}
-	
-	private void populateDBCVTermStockProperties(int dbId){
-		
-		List<String> cvTerms = MetadataExecutionContext.getInstance().getAllCvTermStockProperties();
-		
-		for (String item: cvTerms){
+
+	private void populateDBCVTermStockProperties(int dbId, final CV cv) {
+
+		List<String> cvTerms = MetadataExecutionContext.getInstance()
+				.getAllCvTermStockProperties();
+
+		for (String item : cvTerms) {
 			log.info("Stock CV Term: " + item);
-			
+
 			log.info("Loading CV Term to database...");
-			
+
 			DbXref dbXref = new DbXref();
 			dbXref.setDbId(dbId);
 			dbXref.setPrimaryAccession(item);
 			dbXref.setVersion("");
 			dbXref.setDescription("");
-			
+
 			dbXref = dbXrefDao.mergeAndReturn(dbXref);
-			
+
 			log.info("Loaded DbXref: " + dbXref);
 			
-			
+			addCVTerm(cv, dbXref, item);
+
 		}
-		
+
 	}
-		
+
 }

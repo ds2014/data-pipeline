@@ -3,7 +3,7 @@ package org.jcvi.araport.stock.rowmapper;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-import org.jcvi.araport.stock.domain.CV;
+import org.araport.stock.domain.CV;
 import org.springframework.jdbc.core.RowMapper;
 
 public class CVRowMapper implements RowMapper<CV>{

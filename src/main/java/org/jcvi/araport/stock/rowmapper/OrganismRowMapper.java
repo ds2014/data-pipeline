@@ -3,7 +3,7 @@ package org.jcvi.araport.stock.rowmapper;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-import org.jcvi.araport.stock.domain.Organism;
+import org.araport.stock.domain.Organism;
 import org.springframework.jdbc.core.RowMapper;
 
 public class OrganismRowMapper implements RowMapper<Organism> {

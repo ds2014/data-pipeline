@@ -4,9 +4,9 @@ import java.util.List;
 
 import javax.sql.DataSource;
 
-import org.jcvi.araport.stock.domain.CVTerm;
-import org.jcvi.araport.stock.domain.Db;
-import org.jcvi.araport.stock.domain.DbXref;
+import org.araport.stock.domain.CVTerm;
+import org.araport.stock.domain.Db;
+import org.araport.stock.domain.DbXref;
 
 public interface CVTermDao {
 

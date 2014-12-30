@@ -9,9 +9,9 @@ import javax.sql.DataSource;
 
 import org.apache.log4j.Logger;
 import org.araport.jcvi.stock.application.DataSourceInfrastructureConfiguration;
+import org.araport.stock.domain.Db;
+import org.araport.stock.domain.Organism;
 import org.jcvi.araport.stock.dao.OrganismDao;
-import org.jcvi.araport.stock.domain.Db;
-import org.jcvi.araport.stock.domain.Organism;
 import org.jcvi.araport.stock.rowmapper.DbXrefRowMapper;
 import org.jcvi.araport.stock.rowmapper.OrganismRowMapper;
 import org.springframework.beans.factory.annotation.Autowired;

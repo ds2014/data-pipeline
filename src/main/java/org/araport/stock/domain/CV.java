@@ -1,4 +1,4 @@
-package org.jcvi.araport.stock.domain;
+package org.araport.stock.domain;
 
 public class CV {
 	

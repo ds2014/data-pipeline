@@ -12,9 +12,9 @@ import javax.sql.DataSource;
 
 import org.apache.log4j.Logger;
 import org.araport.jcvi.stock.application.DataSourceInfrastructureConfiguration;
+import org.araport.stock.domain.Db;
+import org.araport.stock.domain.DbXref;
 import org.jcvi.araport.stock.dao.DbXRefDao;
-import org.jcvi.araport.stock.domain.Db;
-import org.jcvi.araport.stock.domain.DbXref;
 import org.jcvi.araport.stock.processor.DbXrefItemProcessor;
 import org.jcvi.araport.stock.rowmapper.DbRowMapper;
 import org.jcvi.araport.stock.rowmapper.DbXrefRowMapper;

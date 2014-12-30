@@ -3,8 +3,8 @@ package org.jcvi.araport.stock.rowmapper;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-import org.jcvi.araport.stock.domain.CV;
-import org.jcvi.araport.stock.domain.CVTerm;
+import org.araport.stock.domain.CV;
+import org.araport.stock.domain.CVTerm;
 import org.springframework.jdbc.core.RowMapper;
 
 public class CVTermRowMapper implements RowMapper<CVTerm> {

@@ -1,6 +1,6 @@
 package org.jcvi.araport.stock.dao;
 
-import org.jcvi.araport.stock.domain.Db;
+import org.araport.stock.domain.Db;
 
 public interface DbDao {
 

@@ -2,7 +2,7 @@ package org.jcvi.araport.stock.listeners;
 
 import org.apache.log4j.Logger;
 import org.araport.jcvi.stock.exception.ExceptionLogger;
-import org.jcvi.araport.stock.domain.DbXref;
+import org.araport.stock.domain.DbXref;
 import org.springframework.batch.core.listener.ItemListenerSupport;
 
 

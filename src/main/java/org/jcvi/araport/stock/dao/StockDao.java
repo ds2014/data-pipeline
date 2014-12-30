@@ -2,8 +2,8 @@ package org.jcvi.araport.stock.dao;
 
 import javax.sql.DataSource;
 
-import org.jcvi.araport.stock.domain.Stock;
-import org.jcvi.araport.stock.domain.StockDbXref;
+import org.araport.stock.domain.Stock;
+import org.araport.stock.domain.StockDbXref;
 
 public interface StockDao {
 

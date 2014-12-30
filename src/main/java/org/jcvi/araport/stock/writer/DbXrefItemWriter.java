@@ -7,11 +7,11 @@ import javax.sql.DataSource;
 
 import org.apache.log4j.Logger;
 import org.araport.jcvi.stock.application.DataSourceInfrastructureConfiguration;
+import org.araport.stock.domain.DbXref;
 import org.jcvi.araport.stock.dao.DbDao;
 import org.jcvi.araport.stock.dao.DbXRefDao;
 import org.jcvi.araport.stock.dao.impl.DbDaoImpl;
 import org.jcvi.araport.stock.dao.impl.DbXrefDaoImpl;
-import org.jcvi.araport.stock.domain.DbXref;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Import;

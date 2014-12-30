@@ -3,7 +3,7 @@ package org.jcvi.araport.stock.rowmapper;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-import org.jcvi.araport.stock.domain.DbXref;
+import org.araport.stock.domain.DbXref;
 import org.springframework.jdbc.core.RowMapper;
 
 public class DbXrefRowMapper implements RowMapper<DbXref> {

@@ -4,8 +4,8 @@ import javax.annotation.Resource;
 import javax.sql.DataSource;
 
 import org.araport.jcvi.stock.application.DataSourceInfrastructureConfiguration;
+import org.araport.stock.domain.DbXref;
 import org.jcvi.araport.stock.dao.impl.DbDaoImpl;
-import org.jcvi.araport.stock.domain.DbXref;
 import org.jcvi.araport.stock.rowmapper.DbXrefRowMapper;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.database.JdbcCursorItemReader;

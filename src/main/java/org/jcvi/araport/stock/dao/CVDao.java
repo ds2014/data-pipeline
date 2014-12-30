@@ -2,9 +2,9 @@ package org.jcvi.araport.stock.dao;
 
 import javax.sql.DataSource;
 
-import org.jcvi.araport.stock.domain.CV;
-import org.jcvi.araport.stock.domain.Db;
-import org.jcvi.araport.stock.domain.DbXref;
+import org.araport.stock.domain.CV;
+import org.araport.stock.domain.Db;
+import org.araport.stock.domain.DbXref;
 
 public interface CVDao {
 

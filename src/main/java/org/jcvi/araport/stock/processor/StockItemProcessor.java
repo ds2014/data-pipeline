@@ -5,6 +5,12 @@ import javax.sql.DataSource;
 
 import org.apache.log4j.Logger;
 import org.araport.jcvi.stock.application.DataSourceInfrastructureConfiguration;
+import org.araport.stock.domain.Db;
+import org.araport.stock.domain.DbXref;
+import org.araport.stock.domain.Organism;
+import org.araport.stock.domain.SourceStockDrivingQuery;
+import org.araport.stock.domain.Stock;
+import org.araport.stock.domain.StockDbXref;
 import org.jcvi.araport.stock.dao.DbDao;
 import org.jcvi.araport.stock.dao.DbXRefDao;
 import org.jcvi.araport.stock.dao.OrganismDao;
@@ -13,11 +19,6 @@ import org.jcvi.araport.stock.dao.impl.DbDaoImpl;
 import org.jcvi.araport.stock.dao.impl.DbXrefDaoImpl;
 import org.jcvi.araport.stock.dao.impl.OrganismDaoImpl;
 import org.jcvi.araport.stock.dao.impl.StockDaoImpl;
-import org.jcvi.araport.stock.domain.Db;
-import org.jcvi.araport.stock.domain.DbXref;
-import org.jcvi.araport.stock.domain.Organism;
-import org.jcvi.araport.stock.domain.SourceStockDrivingQuery;
-import org.jcvi.araport.stock.domain.StockDbXref;
 import org.jcvi.araport.stock.writer.DbXrefItemWriter;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.listener.StepExecutionListenerSupport;
@@ -25,7 +26,6 @@ import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Import;
-import org.jcvi.araport.stock.domain.Stock;
 
 
 @Import({ DataSourceInfrastructureConfiguration.class, DbDaoImpl.class, DbXrefDaoImpl.class, OrganismDaoImpl.class, StockDaoImpl.class })

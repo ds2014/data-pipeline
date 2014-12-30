@@ -2,7 +2,7 @@ package org.jcvi.araport.stock.dao;
 
 import javax.sql.DataSource;
 
-import org.jcvi.araport.stock.domain.Organism;
+import org.araport.stock.domain.Organism;
 
 public interface OrganismDao {
 	

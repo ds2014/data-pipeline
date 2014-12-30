@@ -32,7 +32,7 @@ SELECT
 	  'is_classical_mapping'
 	]
 	)
-	as field_label,
+	as key,
 	unnest(
 	array[
 	cast(source.date_entered as text),
@@ -58,7 +58,7 @@ SELECT
 	source.is_classical_mapping
 		]
 	)
-	as field_value
+	as value
 FROM
 	source
 WHERE
@@ -69,6 +69,19 @@ ORDER BY
 SELECT
 	*
 FROM
-	transpose
+	transpose t
+	join 
+	(
+	select t.name, t.cvterm_id from
+chado.cv 
+join 
+chado.cvterm t
+on 
+cv.cv_id = t.cv_id
+where
+cv.name='stock_property') v
+on 
+t.key = v.name
+	
 WHERE
-	field_value IS NOT null 
+	value IS NOT null 

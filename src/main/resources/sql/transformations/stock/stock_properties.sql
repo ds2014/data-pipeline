@@ -28,7 +28,8 @@ SELECT
 	 'is_germplasm',
 	 'is_seed',
 	 'is_restricted',
-	 'is_molecular_mapping'
+	 'is_molecular_mapping',
+	  'is_classical_mapping'
 	]
 	)
 	as field_label,
@@ -53,7 +54,8 @@ SELECT
 	source.is_germplasm,
 	source.is_seed,
 	source.is_restricted,
-	is_molecular_mapping
+	source.is_molecular_mapping,
+	source.is_classical_mapping
 		]
 	)
 	as field_value

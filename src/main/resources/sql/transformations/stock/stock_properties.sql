@@ -72,7 +72,7 @@ FROM
 	transpose t
 	join 
 	(
-	select t.name, t.cvterm_id from
+	select t.name, t.cvterm_id as type_id from
 chado.cv 
 join 
 chado.cvterm t

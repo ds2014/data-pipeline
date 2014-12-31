@@ -40,6 +40,7 @@ public class ProtocolListener implements JobExecutionListener  {
 		for (StepExecution stepExecution : jobExecution.getStepExecutions()) {
 			protocol.append("\n+++++++++++++++++++++++++++++++++++++++++++++++++++++++ \n");
 			protocol.append("Step " + stepExecution.getStepName() + " \n");
+			protocol.append("ReadCount: " + stepExecution.getReadCount() + "\n");
 			protocol.append("WriteCount: " + stepExecution.getWriteCount() + "\n");
 			protocol.append("Commits: " + stepExecution.getCommitCount() + "\n");
 			protocol.append("SkipCount: " + stepExecution.getSkipCount() + "\n");

@@ -1,3 +1,5 @@
+CREATE materialized view staging.stock_properties_all
+AS
 WITH source as (
 SELECT
 	*, cast ('F' as text) as is_germplasm
@@ -61,10 +63,8 @@ SELECT
 	as value
 FROM
 	source
---WHERE
-	--source.stock_id = 2
---ORDER BY
-	--source.stock_id
+ORDER BY
+	source.stock_id
 	)
 SELECT
 	*
@@ -84,4 +84,4 @@ on
 t.key = v.name
 	
 WHERE
-	value IS NOT null 
+	value IS NOT null;

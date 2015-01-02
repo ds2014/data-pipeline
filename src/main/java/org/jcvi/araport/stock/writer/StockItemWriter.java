@@ -50,6 +50,7 @@ public class StockItemWriter implements ItemWriter<Stock> {
 			}
 		}
 		
+		
 	}
 	
 	@PostConstruct

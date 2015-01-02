@@ -40,7 +40,9 @@ public class SourceStockDrivingQueryReader {
 		
 		JdbcCursorItemReader<SourceStockDrivingQuery> reader = new JdbcCursorItemReader<SourceStockDrivingQuery>();
 		reader.setVerifyCursorPosition(false);
-		String sql = "select stock_id from tair_stg.stock";
+		//for multithreading case state of the reader must be false
+		reader.setSaveState(false);
+		String sql = "select stock_id from tair_stg.stock limit 10";
 		
 		reader.setSql(sql);
 		reader.setDataSource(targetDataSource);

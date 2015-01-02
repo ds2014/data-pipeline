@@ -2,6 +2,7 @@ package org.jcvi.araport.stock.rowmapper.beans;
 
 import org.jcvi.araport.stock.processor.StockItemProcessor;
 import org.jcvi.araport.stock.rowmapper.SourceStockDrivingQueryRowMapper;
+import org.jcvi.araport.stock.rowmapper.StockPropertiesSourceRowMapper;
 import org.jcvi.araport.stock.rowmapper.StockRowMapper;
 import org.jcvi.araport.stock.writer.StockItemWriter;
 import org.springframework.context.annotation.Bean;
@@ -28,5 +29,10 @@ public class RowMapperBeans {
 		return new StockItemWriter();
 	}
 	
+	
+	@Bean
+	public StockPropertiesSourceRowMapper stockPropertiesSourceMapper(){
+		return new StockPropertiesSourceRowMapper();
+	}
 	
 }

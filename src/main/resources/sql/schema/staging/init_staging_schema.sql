@@ -8,7 +8,26 @@ DROP TABLE IF EXISTS staging.stockprop CASCADE;
 DROP MATERIALIZED VIEW IF EXISTS staging.stock_properties_all CASCADE;
 DROP MATERIALIZED VIEW IF EXISTS staging.stock_properties CASCADE;
 
+DROP SEQUENCE IF EXISTS staging.global_id_sequence CASCADE;
+CREATE SEQUENCE staging.global_id_sequence;
 
+CREATE OR REPLACE FUNCTION staging.id_generator(OUT result bigint) AS $$  
+DECLARE  
+    our_epoch bigint := 1314220021721;
+    seq_id bigint;
+    now_millis bigint;
+    -- the id of this DB shard, must be set for each
+    -- schema shard you have - you could pass this as a parameter
+    shard_id int := 1;
+BEGIN  
+    SELECT nextval('staging.global_id_sequence') % 1024 INTO seq_id;
+
+    SELECT FLOOR(EXTRACT(EPOCH FROM clock_timestamp()) * 1000) INTO now_millis;
+    result := (now_millis - our_epoch) << 23;
+    result := result | (shard_id << 10);
+    result := result | (seq_id);
+END;  
+$$ LANGUAGE PLPGSQL;
 
 -- CREATE STAGING STRUCTURES
 CREATE TABLE staging.stockprop (

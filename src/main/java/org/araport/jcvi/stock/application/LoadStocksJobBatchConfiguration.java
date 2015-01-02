@@ -1,5 +1,8 @@
 package org.araport.jcvi.stock.application;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import javax.sql.DataSource;
 
 import org.araport.jcvi.stock.executors.TaskExecutorConfig;
@@ -10,11 +13,15 @@ import org.araport.stock.domain.Db;
 import org.araport.stock.domain.DbXref;
 import org.araport.stock.domain.SourceStockDrivingQuery;
 import org.araport.stock.domain.Stock;
+import org.araport.stock.domain.StockProperty;
+import org.araport.stock.domain.StockPropertySource;
 import org.jcvi.araport.stock.processor.DbXrefItemProcessor;
 import org.jcvi.araport.stock.processor.DbXrefItemProcessor1;
 import org.jcvi.araport.stock.reader.DbXrefItemReader;
 import org.jcvi.araport.stock.reader.SourceStockDrivingQueryReader;
+import org.jcvi.araport.stock.reader.StockPropertiesItemReader;
 import org.jcvi.araport.stock.rowmapper.DbXrefRowMapper;
+import org.jcvi.araport.stock.rowmapper.StockPropertiesSourceRowMapper;
 import org.jcvi.araport.stock.rowmapper.beans.RowMapperBeans;
 import org.jcvi.araport.stock.tasklet.DbLookupTasklet;
 import org.jcvi.araport.stock.tasklet.StockPropertiesCVTermLookupTasklet;
@@ -40,12 +47,16 @@ import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.database.JdbcCursorItemReader;
+import org.springframework.batch.item.database.JdbcPagingItemReader;
+import org.springframework.batch.item.database.Order;
+import org.springframework.batch.item.database.support.PostgresPagingQueryProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
+import org.springframework.context.annotation.Scope;
 import org.springframework.core.env.Environment;
 import org.springframework.core.task.TaskExecutor;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
@@ -55,7 +66,7 @@ import org.springframework.transaction.PlatformTransactionManager;
 @Configuration
 @EnableBatchProcessing
 @Import({ DataSourceInfrastructureConfiguration.class, DbXrefItemReader.class,
-		SourceStockDrivingQueryReader.class, RowMapperBeans.class,
+		SourceStockDrivingQueryReader.class, StockPropertiesItemReader.class, RowMapperBeans.class,
 		TaskExecutorConfig.class, DbLookupTasklet.class,
 		StockPropertiesCVTermLookupTasklet.class, PolicyBean.class})
 
@@ -90,10 +101,22 @@ public class LoadStocksJobBatchConfiguration {
     private ItemReader <SourceStockDrivingQuery> sourceStockReader;
     
     @Autowired
+    private JdbcPagingItemReader<StockPropertySource> sourceStockPropertyReader;
+    
+    @Autowired
+	StockPropertiesSourceRowMapper stockPropertiesSourceMapper;
+    
+    @Autowired
     private ItemProcessor<SourceStockDrivingQuery, Stock> stockItemProcessor;
     
     @Autowired
+    private ItemProcessor <StockPropertySource, StockProperty> stockPropertyItemProcessor;
+    
+    @Autowired
     private ItemWriter<Stock> stockItemWriter;
+    
+    @Autowired
+    private ItemWriter<StockProperty> stockPropertyItemWriter;
     
     @Autowired
     private TaskExecutor taskExecutor;
@@ -138,7 +161,7 @@ public class LoadStocksJobBatchConfiguration {
 	
 	// tag::jobstep[]
 	@Bean
-	public Job loadStocks(){
+	public Job loadStocks() {
 		return jobs.get("STOCK_MASTER_LOADING_STEP")
 				.listener(protocolListener())
 				//.start(stockMasterLoadingStep())
@@ -146,6 +169,7 @@ public class LoadStocksJobBatchConfiguration {
 				.start(dbLookupLoadingStep())
 				.next(stockMasterLoadingStep())
 				.next(dbStockPropertiesCVTermLookup())
+				.next(stockPropertiesLoadingStep())
 				.build();
 	}	
 	
@@ -214,6 +238,25 @@ public class LoadStocksJobBatchConfiguration {
         return stepBuilders
                 .get(DB_CVTERM_LOADING_STEP)
                 .tasklet(dbCVTermLookupTasklet())
+				.build();
+    }
+	
+	
+	@Bean
+    public Step stockPropertiesLoadingStep() {
+        return stepBuilders
+                .get(STOCK_PROPERTIES_LOADING_STEP)
+                .listener(stepStartStopListener())
+				.<StockPropertySource, StockProperty> chunk(10000)
+				.faultTolerant()
+				.skipPolicy(exceptionSkipPolicy)
+				.skip(org.springframework.dao.DataIntegrityViolationException.class)
+				.skip(PSQLException.class)
+				//.reader(dbXRefReader())
+				.reader(sourceStockPropertyReader)
+				.processor(stockPropertyItemProcessor)
+				.writer(stockPropertyItemWriter)
+				.listener(logProcessListener())
 				.build();
     }
 	

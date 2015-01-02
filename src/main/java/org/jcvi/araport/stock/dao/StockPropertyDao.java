@@ -17,5 +17,7 @@ public interface StockPropertyDao {
 	
 	public void setDataSource(DataSource datasource);
 	
+	public void executeSQL(String sql);
+	
 	
 }

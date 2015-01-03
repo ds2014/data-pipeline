@@ -31,6 +31,7 @@ import org.jcvi.araport.stock.listeners.ItemFailureLoggerListener;
 import org.jcvi.araport.stock.listeners.LogProcessListener;
 import org.jcvi.araport.stock.listeners.LogStepStartStopListener;
 import org.jcvi.araport.stock.listeners.ProtocolListener;
+import org.jcvi.araport.stock.listeners.StagingStockPropertiesStepListener;
 import org.postgresql.util.PSQLException;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
@@ -250,7 +251,7 @@ public class LoadStocksJobBatchConfiguration {
         return stepBuilders
                 .get(STOCK_PROPERTIES_STAGING_LOADING_STEP)
                 .listener(stepStartStopListener())
-				.<StockPropertySource, StockProperty> chunk(10000)
+				.<StockPropertySource, StockProperty> chunk(1)
 				.faultTolerant()
 				.skipPolicy(exceptionSkipPolicy)
 				.skip(org.springframework.dao.DataIntegrityViolationException.class)
@@ -259,6 +260,7 @@ public class LoadStocksJobBatchConfiguration {
 				.processor(stockPropertyItemProcessor)
 				.writer(stockPropertyItemWriter)
 				.listener(logProcessListener())
+				.listener(stagingStockPropertiesStepListener())
 				.build();
     }
 	
@@ -321,6 +323,11 @@ public class LoadStocksJobBatchConfiguration {
 	
 	@Bean ItemFailureLoggerListener itemFailureListener(){
 		return new ItemFailureLoggerListener();
+	}
+	
+	@Bean
+	public StagingStockPropertiesStepListener stagingStockPropertiesStepListener() {
+		return new StagingStockPropertiesStepListener();
 	}
 
 }

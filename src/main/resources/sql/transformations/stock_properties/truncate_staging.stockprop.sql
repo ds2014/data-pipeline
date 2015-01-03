@@ -1,1 +1,1 @@
-TRUNCATE staging.stockprop;
+TRUNCATE staging.stockprop CASCADE;

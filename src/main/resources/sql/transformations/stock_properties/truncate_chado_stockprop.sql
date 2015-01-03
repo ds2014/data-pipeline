@@ -1,1 +1,1 @@
-TRUNCATE chado.stockprop;
+TRUNCATE chado.stockprop CASCADE;

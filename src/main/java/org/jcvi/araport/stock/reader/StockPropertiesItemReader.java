@@ -63,13 +63,14 @@ public class StockPropertiesItemReader implements StepExecutionListener {
 		sortKeys.put("stock_id", Order.ASCENDING);
 		provider.setSortKeys(sortKeys);
 
-		provider.setWhereClause("stock_id in (1,2)");
+		//provider.setWhereClause("stock_id in (1,2)");
 
 		JdbcPagingItemReader<StockPropertySource> reader = new JdbcPagingItemReader<StockPropertySource>();
 		reader.setDataSource(targetDataSource);
 		reader.setQueryProvider(provider);
 		reader.setPageSize(1000);
 		reader.setRowMapper(stockPropertiesSourceMapper);
+		reader.setSaveState(false);
 		reader.afterPropertiesSet();
 
 		return reader;

@@ -23,6 +23,7 @@ import org.jcvi.araport.stock.reader.StockPropertiesItemReader;
 import org.jcvi.araport.stock.rowmapper.DbXrefRowMapper;
 import org.jcvi.araport.stock.rowmapper.StockPropertiesSourceRowMapper;
 import org.jcvi.araport.stock.rowmapper.beans.RowMapperBeans;
+import org.jcvi.araport.stock.tasklet.BulkLoadStockPropertiesTasklet;
 import org.jcvi.araport.stock.tasklet.DbLookupTasklet;
 import org.jcvi.araport.stock.tasklet.StockPropertiesCVTermLookupTasklet;
 import org.jcvi.araport.stock.writer.DbXrefItemWriter;
@@ -68,7 +69,7 @@ import org.springframework.transaction.PlatformTransactionManager;
 @Import({ DataSourceInfrastructureConfiguration.class, DbXrefItemReader.class,
 		SourceStockDrivingQueryReader.class, StockPropertiesItemReader.class, RowMapperBeans.class,
 		TaskExecutorConfig.class, DbLookupTasklet.class,
-		StockPropertiesCVTermLookupTasklet.class, PolicyBean.class})
+		StockPropertiesCVTermLookupTasklet.class, BulkLoadStockPropertiesTasklet.class, PolicyBean.class})
 
 public class LoadStocksJobBatchConfiguration {
 
@@ -76,7 +77,8 @@ public class LoadStocksJobBatchConfiguration {
 	public static final String DB_LOOKUP_LOADING_STEP = "dbLookupLoadingStep";
 	public static final String DB_CVTERM_LOADING_STEP = "dbCVTermLookupLoadingStep";
 	public static final String STOCK_CROSSREFERENCES_LOADING_STEP = "stockCrossReferencesLoadingStep";
-	public static final String STOCK_PROPERTIES_LOADING_STEP = "stockPropertiesLoadingStep";
+	public static final String STOCK_PROPERTIES_STAGING_LOADING_STEP = "stockPropertiesStagingLoadingStep";
+	public static final String STOCK_PROPERTIES_BULK_LOADING_STEP = "stockPropertiesBulkLoadingStep";
 	public static final String GERMPLASM_MASTER_LOADING_STEP = "germplasmMasterLoadingStep";
 	
 	@Autowired
@@ -169,7 +171,8 @@ public class LoadStocksJobBatchConfiguration {
 				.start(dbLookupLoadingStep())
 				.next(stockMasterLoadingStep())
 				.next(dbStockPropertiesCVTermLookup())
-				.next(stockPropertiesLoadingStep())
+				.next(stockPropertiesStagingLoadingStep())
+				.next(dbBulkLoadingStockProperties())
 				.build();
 	}	
 	
@@ -243,20 +246,28 @@ public class LoadStocksJobBatchConfiguration {
 	
 	
 	@Bean
-    public Step stockPropertiesLoadingStep() {
+    public Step stockPropertiesStagingLoadingStep() {
         return stepBuilders
-                .get(STOCK_PROPERTIES_LOADING_STEP)
+                .get(STOCK_PROPERTIES_STAGING_LOADING_STEP)
                 .listener(stepStartStopListener())
 				.<StockPropertySource, StockProperty> chunk(10000)
 				.faultTolerant()
 				.skipPolicy(exceptionSkipPolicy)
 				.skip(org.springframework.dao.DataIntegrityViolationException.class)
 				.skip(PSQLException.class)
-				//.reader(dbXRefReader())
 				.reader(sourceStockPropertyReader)
 				.processor(stockPropertyItemProcessor)
 				.writer(stockPropertyItemWriter)
 				.listener(logProcessListener())
+				.build();
+    }
+	
+	
+	@Bean
+    public Step dbBulkLoadingStockProperties() {
+        return stepBuilders
+                .get(STOCK_PROPERTIES_BULK_LOADING_STEP)
+                .tasklet(bulkLoadStockProperties())
 				.build();
     }
 	
@@ -275,6 +286,10 @@ public class LoadStocksJobBatchConfiguration {
 		 return new StockPropertiesCVTermLookupTasklet();
 	 }
 	
+	 @Bean 
+	 public BulkLoadStockPropertiesTasklet bulkLoadStockProperties(){
+		 return new BulkLoadStockPropertiesTasklet();
+	 }
 	/** configure the processor related stuff */
 	 
 	/*

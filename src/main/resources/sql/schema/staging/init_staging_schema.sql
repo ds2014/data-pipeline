@@ -32,7 +32,7 @@ $$ LANGUAGE PLPGSQL;
 -- CREATE STAGING STRUCTURES
 CREATE TABLE staging.stockprop (
     stockprop_id bigint default staging.id_generator(),
-	stock_id int8,
+	stock_id bigint,
 	type_id int4,
 	"value" text,
 	"rank" int4 DEFAULT 0

@@ -29,7 +29,8 @@ SET
 FROM
 	source s
 WHERE
-	t.cv_id = s.stock_type_id
+	t.cv_id = s.stock_type_id AND
+	t.dbxref_id = s.dbxref_id
 	RETURNING t.cv_id,
 	t.name,
 	t.definition,

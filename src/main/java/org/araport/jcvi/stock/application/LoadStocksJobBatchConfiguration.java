@@ -26,6 +26,7 @@ import org.jcvi.araport.stock.rowmapper.StockPropertiesSourceRowMapper;
 import org.jcvi.araport.stock.rowmapper.beans.RowMapperBeans;
 import org.jcvi.araport.stock.tasklet.BulkLoadStockPropertiesTasklet;
 import org.jcvi.araport.stock.tasklet.DbLookupTasklet;
+import org.jcvi.araport.stock.tasklet.StagingStockPropertiesTruncateTasklet;
 import org.jcvi.araport.stock.tasklet.StockPropertiesCVTermLookupTasklet;
 import org.jcvi.araport.stock.writer.DbXrefItemWriter;
 import org.jcvi.araport.stock.writer.StockPropertiesJdbcBatchWriter;
@@ -83,6 +84,7 @@ import org.araport.stock.partitioner.StockColumnRangePartitioner;
 		SourceStockDrivingQueryReader.class, StockPropertiesItemReader.class,
 		RowMapperBeans.class, TaskExecutorConfig.class, DbLookupTasklet.class,
 		StockPropertiesCVTermLookupTasklet.class,
+		StagingStockPropertiesTruncateTasklet.class,
 		BulkLoadStockPropertiesTasklet.class,
 		StockColumnRangePartitioner.class,
 		StockPropertiesJdbcBatchWriter.class, PolicyBean.class })
@@ -96,6 +98,9 @@ public class LoadStocksJobBatchConfiguration {
 	public static final String DB_CVTERM_LOADING_STEP = "dbCVTermLookupLoadingStep";
 	public static final String STOCK_CROSSREFERENCES_LOADING_STEP = "stockCrossReferencesLoadingStep";
 
+	
+	public static final String STOCK_PROPERTIES_STAGING_CLEANUP_STEP = "stockPropertiesStagingCleanupStep";
+	
 	public static final String STOCK_PROPERTIES_MASTER_STAGING_LOADING_STEP = "stockPropertiesMasterStagingLoadingStep";
 
 	public static final String STOCK_PROPERTIES_STAGING_LOADING_STEP = "stockPropertiesStagingLoadingStep";
@@ -149,6 +154,9 @@ public class LoadStocksJobBatchConfiguration {
 
 	@Autowired
 	private TaskExecutor taskExecutor;
+	
+	@Autowired
+	private TaskExecutor concurrentExecutor;
 
 	@Autowired
 	ExceptionSkipPolicy exceptionSkipPolicy;
@@ -198,6 +206,7 @@ public class LoadStocksJobBatchConfiguration {
 				// .next(dbLookupLoadingStep())
 				.start(dbLookupLoadingStep()).next(stockMasterLoadingStep())
 				.next(dbStockPropertiesCVTermLookup())
+				.next(stagingStockPropertiesCleanup())
 				//.next(stockPropertiesStagingLoadingStep())
 				.next(stepStockPropertyMaster())
 				.next(dbBulkLoadingStockProperties()).build();
@@ -277,6 +286,15 @@ public class LoadStocksJobBatchConfiguration {
 	}
 
 	@Bean
+	public Step stagingStockPropertiesCleanup(){
+		
+		return stepBuilders.get(STOCK_PROPERTIES_STAGING_CLEANUP_STEP)
+				.tasklet(stagingStockPropertiesTruncateTasklet()).build();
+		
+	}
+	
+	
+	@Bean
 	public ItemWriter<DbXref> writer() {
 		return new DbXrefItemWriter();
 	}
@@ -294,6 +312,11 @@ public class LoadStocksJobBatchConfiguration {
 	@Bean
 	public BulkLoadStockPropertiesTasklet bulkLoadStockProperties() {
 		return new BulkLoadStockPropertiesTasklet();
+	}
+	
+	@Bean
+	public StagingStockPropertiesTruncateTasklet stagingStockPropertiesTruncateTasklet() {
+		return new StagingStockPropertiesTruncateTasklet();
 	}
 
 	@Bean
@@ -319,14 +342,15 @@ public class LoadStocksJobBatchConfiguration {
 		int gridSize = Integer.parseInt(environment
 				.getProperty("stockprop.partition.size"));
 		
-		log.info("Partition Size: " +gridSize);
+		log.info("Grid Partition Count: " +gridSize);
 		
 		Step masterStep = stepStockPropertyMaster
 				.partitioner(stockPropertiesStagingLoadingStep())
 				.partitioner(STOCK_PROPERTIES_STAGING_LOADING_STEP,
 						stockColumnRangePartitioner()).gridSize(gridSize)
-				.taskExecutor(taskExecutor).build();
-
+			//	.taskExecutor(taskExecutor).build();
+				.taskExecutor(concurrentExecutor).build();
+		
 		return masterStep;
 	}
 	

@@ -67,11 +67,13 @@ public class StagingStockPropertiesStepListener implements
 
 		// 1. Truncating Staging StockProp
        
+		/*
 		log.info("Injected Truncate Staging Stock Properties SQL:"
 				+ TRUNCATE_STAGING_STOCKPROP_SQL);
 		log.info("Truncate Staging Stock Properties Table...");
 
 		generalDao.executeSQL(TRUNCATE_STAGING_STOCKPROP_SQL);
+		*/
 		
 
 	}

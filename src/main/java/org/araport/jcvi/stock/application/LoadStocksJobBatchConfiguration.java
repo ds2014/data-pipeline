@@ -77,6 +77,7 @@ import org.araport.stock.rowmapper.StockPropertiesSourceRowMapper;
 import org.araport.stock.rowmapper.beans.RowMapperBeans;
 import org.araport.stock.tasklet.business.BulkLoadStockPropertiesTasklet;
 import org.araport.stock.tasklet.business.DbLookupTasklet;
+import org.araport.stock.tasklet.business.DbXrefPrimaryStockAccessionsPostLoadTasklet;
 import org.araport.stock.tasklet.business.GeneralModuleInitTasklet;
 import org.araport.stock.tasklet.business.StockPropertiesCVTermLookupTasklet;
 import org.araport.stock.tasklet.staging.BatchSchemaInitTasklet;
@@ -117,6 +118,8 @@ public class LoadStocksJobBatchConfiguration {
 	public static final String DBXREF_PRIMARY_ACCESSIONS_STAGING_STEP = "dbXRefPrimaryAcessionsStagingStep";
 	public static final String DBXREF_PRIMARY_ACCESSIONS_MASTER_LOADING_STEP = "dbXRefPrimaryAcessionsMasterLoadingStep";
 	public static final String DBXREF_PRIMARY_ACCESSIONS_SLAVE_LOADING_STEP = "dbXRefPrimaryAcessionsSlaveLoadingStep";
+	public static final String DBXREF_PRIMARY_ACCESSIONS_POST_LOADING_STEP = "dbXRefPrimaryAcessionsPostLoadingStep";
+	
 	
 		
 	public static final String STOCK_MASTER_LOADING_STEP = "stockMasterLoadingStep";
@@ -231,6 +234,9 @@ public class LoadStocksJobBatchConfiguration {
 	
 	@Autowired
 	StageDbXrefExistingStockAccessionsTasklet stageDbXrefExistingStockAccessionsTasklet;
+	
+	@Autowired
+	DbXrefPrimaryStockAccessionsPostLoadTasklet dbXrefPrimaryAccessionsPostLoadTasklet;
 
 	@Autowired
 	private TaskExecutor taskExecutor;
@@ -283,6 +289,7 @@ public class LoadStocksJobBatchConfiguration {
 				.next(generalModuleInitStep()).next(dbLookupLoadingStep())
 				.next(stageDbXrefExistingStockAccessionsStep())
 				.next(dbXrefMasterLoadingStep())
+				.next(dbXrefPrimaryAccessionsPostLoadingStep())
 				//.next(stockMasterLoadingStep())
 				//.next(dbStockPropertiesCVTermLookup())
 				//.next(stagingStockPropertiesCleanup())
@@ -438,8 +445,13 @@ public class LoadStocksJobBatchConfiguration {
 	}
 
 	
+	@Bean
+	public Step dbXrefPrimaryAccessionsPostLoadingStep() {
+		return stepBuilders.get(DBXREF_PRIMARY_ACCESSIONS_POST_LOADING_STEP)
+				.tasklet(dbXrefPrimaryAccessionsPostLoadTasklet).build();
+	}
 	
-	
+		
 	@Bean
 	public Step dbBulkLoadingStockProperties() {
 		return stepBuilders.get(STOCK_PROPERTIES_BULK_LOADING_STEP)

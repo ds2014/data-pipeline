@@ -25,7 +25,7 @@ public class StageDbXrefExistingStockAccessionsTasklet implements Tasklet {
 	private static final String CREATE_STAGING_BK_DBXREF_SQL = FileUtils
 			.getSqlFileContents(CREATE_STAGING_BK_DBXREF_SQL_PATH);
 
-	private static final String DISABLE_DBXREF_CONSTRAINTS_SQL_PATH = "/sql/transformations/dbxref/chado_disable_constraints.sql";
+	private static final String DISABLE_DBXREF_CONSTRAINTS_SQL_PATH = "/sql/transformations/dbxref/disable_chado_dbxref_constraints.sql";
 	private static final String DISABLE_DBXREF_CONSTRAINTS_SQL = FileUtils
 			.getSqlFileContents(DISABLE_DBXREF_CONSTRAINTS_SQL_PATH);
 

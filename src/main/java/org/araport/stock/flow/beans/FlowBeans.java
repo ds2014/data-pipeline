@@ -1,6 +1,7 @@
 package org.araport.stock.flow.beans;
 
 import org.araport.stock.tasklet.business.GeneralModuleInitTasklet;
+import org.araport.stock.tasklet.business.DbXrefPrimaryStockAccessionsPostLoadTasklet;
 import org.araport.stock.tasklet.staging.*;
 import org.springframework.context.annotation.Bean;
 
@@ -26,4 +27,8 @@ public class FlowBeans {
 		return new StageDbXrefExistingStockAccessionsTasklet();
 	}
 	
+	@Bean
+	public DbXrefPrimaryStockAccessionsPostLoadTasklet dbXrefPrimaryAccessionsPostLoadTasklet(){
+		return new DbXrefPrimaryStockAccessionsPostLoadTasklet();
+	}
 }

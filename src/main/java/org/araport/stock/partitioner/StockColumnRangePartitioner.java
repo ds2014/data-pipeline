@@ -41,10 +41,8 @@ public class StockColumnRangePartitioner implements Partitioner {
 	@Autowired
 	DataSource targetDataSource;
 
-	private NamedParameterJdbcOperations namedParameterJdbcTemplate;
 	private JdbcTemplate jdbcTemplate;
 	private String table;
-
 	private String column;
 
 	private String whereClause;
@@ -85,9 +83,7 @@ public class StockColumnRangePartitioner implements Partitioner {
 	 *            a {@link DataSource}
 	 */
 	public void setDataSource(DataSource dataSource) {
-		this.namedParameterJdbcTemplate = new NamedParameterJdbcTemplate(
-				dataSource);
-		jdbcTemplate = new JdbcTemplate(dataSource);
+			jdbcTemplate = new JdbcTemplate(dataSource);
 	}
 
 	/**
@@ -151,8 +147,7 @@ public class StockColumnRangePartitioner implements Partitioner {
 
 	@PostConstruct
 	public void setDataSource() {
-		this.namedParameterJdbcTemplate = new NamedParameterJdbcTemplate(
-				targetDataSource);
+		
 		this.jdbcTemplate = new JdbcTemplate(targetDataSource);
 
 	}

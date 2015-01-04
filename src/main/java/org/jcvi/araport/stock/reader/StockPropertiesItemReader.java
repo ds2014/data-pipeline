@@ -37,6 +37,8 @@ import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.context.annotation.PropertySources;
 import org.springframework.context.annotation.Scope;
+import org.springframework.core.env.Environment;
+import org.springframework.core.io.ResourceLoader;
 import org.springframework.stereotype.Component;
 
 @Component("source_stockproperty_reader")
@@ -49,14 +51,32 @@ public class StockPropertiesItemReader {
 			.getLogger(StockPropertiesItemReader.class);
 
 	@Autowired
+	Environment environment;
+	
+	@Autowired
+	private ResourceLoader resourceLoader;
+	
+	@Autowired
 	DataSource targetDataSource;
 
 	@Autowired
 	StockPropertiesSourceRowMapper stockPropertiesSourceMapper;
-
-	private int minValue;
-	private int maxValue;
-
+	
+	 @Value("${stockprop.select.clause}")
+	 private String selectClause;
+	 
+	 @Value("${stockprop.where.clause}")
+	 private String whereClause;
+	 
+	 @Value("${stockprop.from.clause}")
+	 private String fromClause;
+	 
+	 @Value("${stockprop.sortkey}")
+	 private String sortKey;
+	 
+	 @Value("${stockprop.page.size}")
+	 private int pageSize;
+		
 	@Bean
 	@StepScope
 	public JdbcPagingItemReader<StockPropertySource> sourceStockPropertyReader(
@@ -66,15 +86,14 @@ public class StockPropertiesItemReader {
 			throws Exception {
 
 		PostgresPagingQueryProvider provider = new PostgresPagingQueryProvider();
-		provider.setSelectClause("select stock_id, key, value, type_id");
-		provider.setFromClause("from staging.stock_properties");
+		provider.setSelectClause(selectClause);
+		provider.setFromClause(fromClause);
 
 		Map<String, Order> sortKeys = new HashMap<String, Order>();
-		sortKeys.put("stock_id", Order.ASCENDING);
+		sortKeys.put(sortKey, Order.ASCENDING);
 		provider.setSortKeys(sortKeys);
 		
-	   // provider.setWhereClause("stock_id >= :minValue and stock_id <= :maxValue and stock_id in (1,2,3, 4,5, 6, 7, 8, 9, 10)");
-	    provider.setWhereClause("stock_id >= :minValue and stock_id <= :maxValue");
+	    provider.setWhereClause(whereClause);
 
 		JdbcPagingItemReader<StockPropertySource> reader = new JdbcPagingItemReader<StockPropertySource>();
 		reader.setDataSource(targetDataSource);
@@ -85,9 +104,8 @@ public class StockPropertiesItemReader {
 		params.put("maxValue", maxValue);
 		reader.setParameterValues(params);
 				
-		reader.setPageSize(1000);
+		reader.setPageSize(pageSize);
 		reader.setRowMapper(stockPropertiesSourceMapper);
-		//reader.setSaveState(false);
 		reader.afterPropertiesSet();
 
 		log.info("Partition: " + partitionName + "; Id Range: " + "MinValue: "

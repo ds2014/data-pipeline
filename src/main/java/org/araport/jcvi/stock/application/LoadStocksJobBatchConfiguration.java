@@ -60,6 +60,7 @@ import org.springframework.batch.item.database.JdbcPagingItemReader;
 import org.springframework.batch.item.database.Order;
 import org.springframework.batch.item.database.support.PostgresPagingQueryProvider;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
@@ -91,16 +92,18 @@ import org.araport.stock.partitioner.StockColumnRangePartitioner;
 @PropertySources(value = { @PropertySource("classpath:/partition.properties") })
 public class LoadStocksJobBatchConfiguration {
 
-	private static final Logger  log = Logger.getLogger(LogStepStartStopListener.class);
+	private static final Logger log = Logger
+			.getLogger(LogStepStartStopListener.class);
+
+	public static final String MAIN_JOB = "mainJob";
 	
 	public static final String STOCK_MASTER_LOADING_STEP = "stockMasterLoadingStep";
 	public static final String DB_LOOKUP_LOADING_STEP = "dbLookupLoadingStep";
 	public static final String DB_CVTERM_LOADING_STEP = "dbCVTermLookupLoadingStep";
 	public static final String STOCK_CROSSREFERENCES_LOADING_STEP = "stockCrossReferencesLoadingStep";
 
-	
 	public static final String STOCK_PROPERTIES_STAGING_CLEANUP_STEP = "stockPropertiesStagingCleanupStep";
-	
+
 	public static final String STOCK_PROPERTIES_MASTER_STAGING_LOADING_STEP = "stockPropertiesMasterStagingLoadingStep";
 
 	public static final String STOCK_PROPERTIES_STAGING_LOADING_STEP = "stockPropertiesStagingLoadingStep";
@@ -112,6 +115,21 @@ public class LoadStocksJobBatchConfiguration {
 
 	@Autowired
 	private ResourceLoader resourceLoader;
+
+	@Value("${stockprop.partitioner.table}")
+	private String stockPropPartitionerTable;
+
+	@Value("${stockprop.partitioner.where.clause}")
+	private String stockPropPartitionerWhereClause;
+
+	@Value("${stockprop.partitioner.column}")
+	private String stockPropPartitionerColumn;
+
+	@Value("${stockprop.partition.size}")
+	private int stockPropPartitionCount;
+
+	@Value("${stockprop.chunk.size}")
+	private int stockPropChunkSize;
 
 	@Autowired
 	private JobBuilderFactory jobs;
@@ -154,18 +172,12 @@ public class LoadStocksJobBatchConfiguration {
 
 	@Autowired
 	private TaskExecutor taskExecutor;
-	
+
 	@Autowired
 	private TaskExecutor concurrentExecutor;
 
 	@Autowired
 	ExceptionSkipPolicy exceptionSkipPolicy;
-
-	// @Autowired
-	// JobLauncher jobLauncher;
-
-	// @Autowired
-	// JobRepository jobRepository;
 
 	@Autowired
 	JobExplorer jobExplorer;
@@ -200,14 +212,14 @@ public class LoadStocksJobBatchConfiguration {
 	@Bean
 	public Job loadStocks() throws Exception {
 		return jobs
-				.get("STOCK_MASTER_LOADING_STEP")
+				.get(MAIN_JOB)
 				.listener(protocolListener())
 				// .start(stockMasterLoadingStep())
 				// .next(dbLookupLoadingStep())
 				.start(dbLookupLoadingStep()).next(stockMasterLoadingStep())
 				.next(dbStockPropertiesCVTermLookup())
 				.next(stagingStockPropertiesCleanup())
-				//.next(stockPropertiesStagingLoadingStep())
+				// .next(stockPropertiesStagingLoadingStep())
 				.next(stepStockPropertyMaster())
 				.next(dbBulkLoadingStockProperties()).build();
 	}
@@ -244,8 +256,7 @@ public class LoadStocksJobBatchConfiguration {
 				.skip(PSQLException.class)
 				// .reader(dbXRefReader())
 				.reader(sourceStockReader).processor(stockItemProcessor)
-				.writer(stockItemWriter).//taskExecutor(taskExecutor).throttleLimit(6).
-				listener(logProcessListener()).build();
+				.writer(stockItemWriter).listener(logProcessListener()).build();
 	}
 
 	@Bean
@@ -265,18 +276,15 @@ public class LoadStocksJobBatchConfiguration {
 		return stepBuilders
 				.get(STOCK_PROPERTIES_STAGING_LOADING_STEP)
 				.listener(stepStartStopListener())
-				.<StockPropertySource, StockProperty> chunk(10000)
+				.<StockPropertySource, StockProperty> chunk(stockPropChunkSize)
 				.faultTolerant()
 				.skipPolicy(exceptionSkipPolicy)
 				.skip(org.springframework.dao.DataIntegrityViolationException.class)
 				.skip(PSQLException.class).reader(sourceStockPropertyReader)
 				.processor(stockPropertyItemProcessor)
-				// .writer(stockPropertyItemWriter).taskExecutor(taskExecutor).throttleLimit(10)
 				.writer(stockPropertyJdbcBatchWriter)
-				// .taskExecutor(taskExecutor).throttleLimit(10)
 				.listener(logProcessListener())
-				.listener(stagingStockPropertiesStepListener())
-				.build();
+				.listener(stagingStockPropertiesStepListener()).build();
 	}
 
 	@Bean
@@ -286,14 +294,13 @@ public class LoadStocksJobBatchConfiguration {
 	}
 
 	@Bean
-	public Step stagingStockPropertiesCleanup(){
-		
+	public Step stagingStockPropertiesCleanup() {
+
 		return stepBuilders.get(STOCK_PROPERTIES_STAGING_CLEANUP_STEP)
 				.tasklet(stagingStockPropertiesTruncateTasklet()).build();
-		
+
 	}
-	
-	
+
 	@Bean
 	public ItemWriter<DbXref> writer() {
 		return new DbXrefItemWriter();
@@ -313,7 +320,7 @@ public class LoadStocksJobBatchConfiguration {
 	public BulkLoadStockPropertiesTasklet bulkLoadStockProperties() {
 		return new BulkLoadStockPropertiesTasklet();
 	}
-	
+
 	@Bean
 	public StagingStockPropertiesTruncateTasklet stagingStockPropertiesTruncateTasklet() {
 		return new StagingStockPropertiesTruncateTasklet();
@@ -323,12 +330,8 @@ public class LoadStocksJobBatchConfiguration {
 	public StockColumnRangePartitioner stockColumnRangePartitioner() {
 		StockColumnRangePartitioner partitioner = new StockColumnRangePartitioner();
 		partitioner.setDataSource(targetDataSource);
-		partitioner.setTable("staging.stock_properties");
-		partitioner.setColumn("stock_id");
-		//partitioner.setWhereClause("stock_id in (1,2,3, 4,5, 6, 7, 8, 9, 10)");
-		//partitioner.partition(10);
-		//Map<String, ExecutionContext> partition = partitioner
-			//	.partition(gridSize);
+		partitioner.setTable(stockPropPartitionerTable);
+		partitioner.setColumn(stockPropPartitionerColumn);
 
 		return partitioner;
 	}
@@ -339,23 +342,17 @@ public class LoadStocksJobBatchConfiguration {
 		StepBuilder stepStockPropertyMaster = stepBuilders
 				.get(STOCK_PROPERTIES_MASTER_STAGING_LOADING_STEP);
 
-		int gridSize = Integer.parseInt(environment
-				.getProperty("stockprop.partition.size"));
-		
-		log.info("Grid Partition Count: " +gridSize);
-		
+		log.info("Grid Partition Count: " + stockPropPartitionCount);
+
 		Step masterStep = stepStockPropertyMaster
 				.partitioner(stockPropertiesStagingLoadingStep())
 				.partitioner(STOCK_PROPERTIES_STAGING_LOADING_STEP,
-						stockColumnRangePartitioner()).gridSize(gridSize)
-			//	.taskExecutor(taskExecutor).build();
+						stockColumnRangePartitioner())
+				.gridSize(stockPropPartitionCount)
 				.taskExecutor(concurrentExecutor).build();
-		
+
 		return masterStep;
 	}
-	
-
-	/** configure the processor related stuff */
 
 	/*
 	 * @Bean public ItemProcessor<DbXref, DbXref> dbXrefProcessor() { return new
@@ -391,11 +388,10 @@ public class LoadStocksJobBatchConfiguration {
 	public StagingStockPropertiesStepListener stagingStockPropertiesStepListener() {
 		return new StagingStockPropertiesStepListener();
 	}
-	
+
 	@Bean
-	public StockPropertiesItemReader stockPropertiesItemReaderListener(){
+	public StockPropertiesItemReader stockPropertiesItemReaderListener() {
 		return new StockPropertiesItemReader();
 	}
-
 
 }

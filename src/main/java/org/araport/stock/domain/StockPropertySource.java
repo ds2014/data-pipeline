@@ -67,5 +67,11 @@ public class StockPropertySource {
 		this.typeId = type_id;
 	}
 
+	@Override
+	public String toString() {
+		return "StockPropertySource [stockId=" + stockId + ", key=" + key
+				+ ", value=" + value + ", typeId=" + typeId + "]";
+	}
+
 
 }

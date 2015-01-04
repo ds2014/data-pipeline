@@ -8,6 +8,7 @@ import javax.sql.DataSource;
 import org.apache.log4j.Logger;
 import org.araport.stock.domain.Db;
 import org.araport.stock.domain.DbXref;
+import org.araport.stock.domain.DbXrefSource;
 import org.araport.stock.domain.SourceStockDrivingQuery;
 import org.araport.stock.domain.Stock;
 import org.araport.stock.domain.StockProperty;
@@ -68,6 +69,7 @@ import org.araport.stock.policy.StockSkipListener;
 import org.araport.stock.processor.DbXrefItemProcessor;
 import org.araport.stock.processor.DbXrefItemProcessor1;
 import org.araport.stock.reader.DbXrefItemReader;
+import org.araport.stock.reader.DbXrefJdbcPagingItemReader;
 import org.araport.stock.reader.SourceStockDrivingQueryReader;
 import org.araport.stock.reader.StockPropertiesItemReader;
 import org.araport.stock.rowmapper.DbXrefRowMapper;
@@ -82,6 +84,7 @@ import org.araport.stock.tasklet.staging.StageDbXrefExistingStockAccessionsTaskl
 import org.araport.stock.tasklet.staging.StagingSchemaInitTasklet;
 import org.araport.stock.tasklet.staging.StagingStockPropertiesTruncateTasklet;
 import org.araport.stock.writer.DbXrefItemWriter;
+import org.araport.stock.writer.DbXrefJdbcBatchWriter;
 import org.araport.stock.writer.StockPropertiesJdbcBatchWriter;
 
 @Configuration
@@ -93,7 +96,7 @@ import org.araport.stock.writer.StockPropertiesJdbcBatchWriter;
 		StagingStockPropertiesTruncateTasklet.class,
 		BulkLoadStockPropertiesTasklet.class,
 		StockColumnRangePartitioner.class,
-		StockPropertiesJdbcBatchWriter.class, FlowBeans.class, PolicyBean.class })
+		StockPropertiesJdbcBatchWriter.class, DbXrefJdbcPagingItemReader.class, DbXrefJdbcBatchWriter.class, FlowBeans.class, PolicyBean.class })
 @PropertySources(value = { @PropertySource("classpath:/partition.properties") })
 public class LoadStocksJobBatchConfiguration {
 
@@ -112,6 +115,9 @@ public class LoadStocksJobBatchConfiguration {
 
 	//DbXref Primary Accessions
 	public static final String DBXREF_PRIMARY_ACCESSIONS_STAGING_STEP = "dbXRefPrimaryAcessionsStagingStep";
+	public static final String DBXREF_PRIMARY_ACCESSIONS_MASTER_LOADING_STEP = "dbXRefPrimaryAcessionsMasterLoadingStep";
+	public static final String DBXREF_PRIMARY_ACCESSIONS_SLAVE_LOADING_STEP = "dbXRefPrimaryAcessionsSlaveLoadingStep";
+	
 		
 	public static final String STOCK_MASTER_LOADING_STEP = "stockMasterLoadingStep";
 	public static final String DB_LOOKUP_LOADING_STEP = "dbLookupLoadingStep";
@@ -167,6 +173,9 @@ public class LoadStocksJobBatchConfiguration {
 
 	@Autowired
 	private JdbcPagingItemReader<StockPropertySource> sourceStockPropertyReader;
+	
+	@Autowired
+	JdbcPagingItemReader<DbXrefSource> dbXrefJdbcItemReader;
 
 	@Autowired
 	StockPropertiesSourceRowMapper stockPropertiesSourceMapper;
@@ -185,6 +194,12 @@ public class LoadStocksJobBatchConfiguration {
 
 	@Autowired
 	ItemWriter<StockProperty> stockPropertyJdbcBatchWriter;
+	
+	@Autowired
+	ItemWriter<DbXref> dbXrefJdbcBatchWriter;
+	
+	@Autowired
+	ItemProcessor <DbXrefSource, DbXref> dbXrefBatchProcessor;
 
 	@Autowired
 	BatchSchemaInitTasklet batchSchemaInitTasklet;
@@ -367,6 +382,25 @@ public class LoadStocksJobBatchConfiguration {
 				.listener(stagingStockPropertiesStepListener()).build();
 	}
 
+	@Bean
+	public Step dbXrefSlaveLoadingStep() {
+		return stepBuilders
+				.get(DBXREF_PRIMARY_ACCESSIONS_SLAVE_LOADING_STEP)
+				.listener(stepStartStopListener())
+				.<DbXrefSource, DbXref> chunk(stockPropChunkSize)
+				.faultTolerant()
+				.skipPolicy(exceptionSkipPolicy)
+				.skip(org.springframework.dao.DataIntegrityViolationException.class)
+				.skip(PSQLException.class).reader(dbXrefJdbcItemReader)
+				.processor(dbXrefBatchProcessor)
+				.writer(dbXrefJdbcBatchWriter)
+				.listener(logProcessListener())
+				.listener(stagingStockPropertiesStepListener()).build();
+	}
+
+	
+	
+	
 	@Bean
 	public Step dbBulkLoadingStockProperties() {
 		return stepBuilders.get(STOCK_PROPERTIES_BULK_LOADING_STEP)

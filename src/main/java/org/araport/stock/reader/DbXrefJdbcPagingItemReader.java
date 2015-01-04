@@ -29,7 +29,7 @@ import org.springframework.core.env.Environment;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.stereotype.Component;
 
-@Component("source_stockproperty_reader")
+@Component("dbxref_jdbc_item_paging_reader")
 @Import({ DataSourceInfrastructureConfiguration.class,
 		RowMapperBeans.class })
 @PropertySources(value = { @PropertySource("classpath:/partition.properties") })

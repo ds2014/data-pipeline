@@ -24,7 +24,7 @@ public class StockPropertiesJdbcBatchWriter {
 	@Autowired
 	DataSource targetDataSource;
 	
-	private static final Log log = LogFactory.getLog(StockPropertyItemWriter.class);
+	private static final Log log = LogFactory.getLog(StockPropertiesJdbcBatchWriter.class);
 	
 	private static final String INSERT_NAMED_PARAM_SQL_PATH = "/sql/transformations/stock_properties/insert_stock_property_namedparams_batchwriter.sql";
 	

@@ -18,7 +18,7 @@ import org.springframework.context.annotation.Import;
 import org.springframework.stereotype.Component;
 
 @Component("dbxref_batch_writer")
-@Import({ DataSourceInfrastructureConfiguration.class, StockPropertyDaoImpl.class })
+@Import({ DataSourceInfrastructureConfiguration.class})
 public class DbXrefJdbcBatchWriter {
 
 	@Autowired
@@ -26,7 +26,7 @@ public class DbXrefJdbcBatchWriter {
 	
 	private static final Log log = LogFactory.getLog(DbXrefJdbcBatchWriter.class);
 	
-	private static final String INSERT_NAMED_PARAM_SQL_PATH = "/sql/transformations/dbxref/primary_stock_accession/insert_stock_property_namedparams_batchwriter.sql";
+	private static final String INSERT_NAMED_PARAM_SQL_PATH = "/sql/transformations/dbxref/primary_stock_accession/insert_dbxref_namedparams_batchwriter.sql";
 	
 	private static final String INSERT_NAMED_PARAM_SQL = FileUtils.getSqlFileContents(INSERT_NAMED_PARAM_SQL_PATH);
 	

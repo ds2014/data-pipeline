@@ -1,9 +1,12 @@
 package org.araport.stock.rowmapper.beans;
 
 import org.araport.stock.domain.StockPropertySource;
+import org.araport.stock.processor.DbXrefBatchProcessor;
 import org.araport.stock.processor.StockItemProcessor;
 import org.araport.stock.processor.StockPropertyItemProcessor;
 import org.araport.stock.reader.StockPropertiesItemReader;
+import org.araport.stock.rowmapper.DbXrefRowMapper;
+import org.araport.stock.rowmapper.DbXrefSourceRowMapper;
 import org.araport.stock.rowmapper.SourceStockDrivingQueryRowMapper;
 import org.araport.stock.rowmapper.StockPropertiesSourceRowMapper;
 import org.araport.stock.rowmapper.StockPropertyRowMapper;
@@ -55,6 +58,21 @@ public class RowMapperBeans {
 	@Bean
 	public StockPropertyRowMapper stockPropertyRowMapper(){
 		return new StockPropertyRowMapper();
+	}
+	
+	@Bean 
+	public DbXrefRowMapper dbXrefRowMapper(){
+		return new DbXrefRowMapper();
+	}
+	
+	@Bean 
+	public DbXrefSourceRowMapper dbXrefSourceRowMapper(){
+		return new DbXrefSourceRowMapper();
+	}
+	
+	@Bean
+	public DbXrefBatchProcessor dbXrefBatchProcessor(){
+		return new DbXrefBatchProcessor();
 	}
 		
 }

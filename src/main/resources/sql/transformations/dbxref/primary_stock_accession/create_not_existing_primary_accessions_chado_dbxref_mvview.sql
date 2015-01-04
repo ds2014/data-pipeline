@@ -2,11 +2,7 @@ DROP MATERIALIZED VIEW IF EXISTS staging.dbxref_not_existing_primary_stock_acces
 CREATE
 	materialized view staging.dbxref_not_existing_primary_stock_accessions AS
 SELECT
-	cast (
-	stock_id as varchar(
-	255)
-	)
-	as accession,
+	cast (stock_id as bigint) as accession,
 	cast (
 	staging.get_tair_db_id_by_name(
 	'TAIR Stock')
@@ -17,7 +13,7 @@ FROM
 	EXCEPT
 	ALL
 SELECT
-	dbx.accession,
+	cast(dbx.accession as bigint) asaccession,
 	db.db_id as db_id
 FROM
 	dbxref dbx JOIN db
@@ -32,3 +28,4 @@ WHERE
 	);
 CREATE INDEX accession_idx
   ON staging.dbxref_not_existing_primary_stock_accessions (accession);
+

@@ -21,4 +21,9 @@ public class FlowBeans {
 		return new GeneralModuleInitTasklet();
 	}
 	
+	@Bean
+	public StageDbXrefExistingStockAccessionsTasklet stageDbXrefExistingStockAccessionsTasklet(){
+		return new StageDbXrefExistingStockAccessionsTasklet();
+	}
+	
 }

@@ -2,19 +2,15 @@ ALTER
 	TABLE chado.dbxref
 DROP
 	CONSTRAINT IF EXISTS dbxref_pkey CASCADE;
-	
-	
+
 ALTER
 	TABLE chado.dbxref
 DROP
 	CONSTRAINT IF EXISTS dbxref_db_id_fkey CASCADE;
-	
-
 ALTER
 	TABLE chado.dbxref
 DROP
 	CONSTRAINT IF EXISTS dbxref_c1;
-
 ALTER
 	TABLE chado.dbxref
 ALTER

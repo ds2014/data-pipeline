@@ -65,7 +65,7 @@ public class DbXrefJdbcPagingItemReader {
 	 
 	 @Value("${dbxref.page.size}")
 	 private int pageSize;
-		
+	 	 		
 	@Bean
 	@StepScope
 	public JdbcPagingItemReader<DbXrefSource> dbXrefJdbcItemReader(

@@ -116,7 +116,7 @@ public class StockColumnRangePartitioner implements Partitioner {
 		log.info("***********************************************************");
 		log.info("count = " + count + " min = " + min + " max = " + max
 				+ " targetSize = " + targetSize);
-		log.debug("***********************************************************");
+		log.info("***********************************************************");
 		
 		Map<String, ExecutionContext> result = new HashMap<String, ExecutionContext>();
 		

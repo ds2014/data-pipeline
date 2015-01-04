@@ -138,6 +138,7 @@ public class LoadStocksJobBatchConfiguration {
 	@Autowired
 	private ResourceLoader resourceLoader;
 
+	// Stock Properties Partition
 	@Value("${stockprop.partitioner.table}")
 	private String stockPropPartitionerTable;
 
@@ -152,6 +153,24 @@ public class LoadStocksJobBatchConfiguration {
 
 	@Value("${stockprop.chunk.size}")
 	private int stockPropChunkSize;
+	
+	//DbXref Partition
+	
+	@Value("${dbxref.partitioner.table}")
+	private String dbXrefPartitionerTable;
+
+	@Value("${dbxref.partitioner.where.clause}")
+	private String dbXrefPartitionerWhereClause;
+
+	@Value("${dbxref.partitioner.column}")
+	private String dbXrefPartitionerColumn;
+
+	@Value("${dbxref.partition.size}")
+	private int dbXrefPartitionCount;
+
+	@Value("${dbxref.chunk.size}")
+	private int dbXrefChunkSize;
+	
 
 	@Autowired
 	private JobBuilderFactory jobs;
@@ -263,6 +282,7 @@ public class LoadStocksJobBatchConfiguration {
 				.start(batchSchemaInitStep()).next(stagingSchemaInitStep())
 				.next(generalModuleInitStep()).next(dbLookupLoadingStep())
 				.next(stageDbXrefExistingStockAccessionsStep())
+				.next(dbXrefMasterLoadingStep())
 				//.next(stockMasterLoadingStep())
 				//.next(dbStockPropertiesCVTermLookup())
 				//.next(stagingStockPropertiesCleanup())
@@ -382,12 +402,31 @@ public class LoadStocksJobBatchConfiguration {
 				.listener(stagingStockPropertiesStepListener()).build();
 	}
 
+
+	@Bean
+	public Step dbXrefMasterLoadingStep() throws Exception {
+
+		StepBuilder stepDBXrefMaster = stepBuilders
+				.get(DBXREF_PRIMARY_ACCESSIONS_MASTER_LOADING_STEP);
+
+		log.info("Grid Partition Count: " + dbXrefPartitionCount);
+
+		Step masterStep = stepDBXrefMaster
+				.partitioner(dbXrefSlaveLoadingStep())
+				.partitioner(DBXREF_PRIMARY_ACCESSIONS_SLAVE_LOADING_STEP,
+						dbXrefColumnRangePartitioner())
+				.gridSize(dbXrefPartitionCount)
+				.taskExecutor(concurrentExecutor).build();
+
+		return masterStep;
+	}
+	
 	@Bean
 	public Step dbXrefSlaveLoadingStep() {
 		return stepBuilders
 				.get(DBXREF_PRIMARY_ACCESSIONS_SLAVE_LOADING_STEP)
 				.listener(stepStartStopListener())
-				.<DbXrefSource, DbXref> chunk(stockPropChunkSize)
+				.<DbXrefSource, DbXref> chunk(dbXrefChunkSize)
 				.faultTolerant()
 				.skipPolicy(exceptionSkipPolicy)
 				.skip(org.springframework.dao.DataIntegrityViolationException.class)
@@ -446,7 +485,17 @@ public class LoadStocksJobBatchConfiguration {
 		partitioner.setDataSource(targetDataSource);
 		partitioner.setTable(stockPropPartitionerTable);
 		partitioner.setColumn(stockPropPartitionerColumn);
-
+		
+		return partitioner;
+	}
+	
+	@Bean
+	public StockColumnRangePartitioner dbXrefColumnRangePartitioner() {
+		StockColumnRangePartitioner partitioner = new StockColumnRangePartitioner();
+		partitioner.setDataSource(targetDataSource);
+		partitioner.setTable(dbXrefPartitionerTable);
+		partitioner.setColumn(dbXrefPartitionerColumn);
+		
 		return partitioner;
 	}
 

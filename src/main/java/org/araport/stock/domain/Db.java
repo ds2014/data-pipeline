@@ -1,7 +1,7 @@
 package org.araport.stock.domain;
 
 import org.apache.log4j.Logger;
-import org.jcvi.araport.stock.listeners.ItemFailureLoggerListener;
+import org.araport.stock.listeners.ItemFailureLoggerListener;
 
 public class Db {
 

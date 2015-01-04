@@ -4,7 +4,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.log4j.Logger;
-import org.jcvi.araport.stock.listeners.ProtocolListener;
+import org.araport.stock.listeners.ProtocolListener;
 
 public class DbXref {
 	

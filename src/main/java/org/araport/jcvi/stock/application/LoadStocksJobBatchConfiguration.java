@@ -6,35 +6,14 @@ import java.util.Map;
 import javax.sql.DataSource;
 
 import org.apache.log4j.Logger;
-import org.araport.jcvi.stock.executors.TaskExecutorConfig;
-import org.araport.jcvi.stock.policy.ExceptionSkipPolicy;
-import org.araport.jcvi.stock.policy.PolicyBean;
-import org.araport.jcvi.stock.policy.StockSkipListener;
 import org.araport.stock.domain.Db;
 import org.araport.stock.domain.DbXref;
 import org.araport.stock.domain.SourceStockDrivingQuery;
 import org.araport.stock.domain.Stock;
 import org.araport.stock.domain.StockProperty;
 import org.araport.stock.domain.StockPropertySource;
-import org.jcvi.araport.stock.processor.DbXrefItemProcessor;
-import org.jcvi.araport.stock.processor.DbXrefItemProcessor1;
-import org.jcvi.araport.stock.reader.DbXrefItemReader;
-import org.jcvi.araport.stock.reader.SourceStockDrivingQueryReader;
-import org.jcvi.araport.stock.reader.StockPropertiesItemReader;
-import org.jcvi.araport.stock.rowmapper.DbXrefRowMapper;
-import org.jcvi.araport.stock.rowmapper.StockPropertiesSourceRowMapper;
-import org.jcvi.araport.stock.rowmapper.beans.RowMapperBeans;
-import org.jcvi.araport.stock.tasklet.BulkLoadStockPropertiesTasklet;
-import org.jcvi.araport.stock.tasklet.DbLookupTasklet;
-import org.jcvi.araport.stock.tasklet.StagingStockPropertiesTruncateTasklet;
-import org.jcvi.araport.stock.tasklet.StockPropertiesCVTermLookupTasklet;
-import org.jcvi.araport.stock.writer.DbXrefItemWriter;
-import org.jcvi.araport.stock.writer.StockPropertiesJdbcBatchWriter;
-import org.jcvi.araport.stock.listeners.ItemFailureLoggerListener;
-import org.jcvi.araport.stock.listeners.LogProcessListener;
-import org.jcvi.araport.stock.listeners.LogStepStartStopListener;
-import org.jcvi.araport.stock.listeners.ProtocolListener;
-import org.jcvi.araport.stock.listeners.StagingStockPropertiesStepListener;
+import org.araport.stock.executors.TaskExecutorConfig;
+import org.araport.stock.flow.beans.FlowBeans;
 import org.postgresql.util.PSQLException;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
@@ -77,7 +56,32 @@ import org.springframework.scheduling.concurrent.ConcurrentTaskExecutor;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.PlatformTransactionManager;
+import org.araport.stock.listeners.ItemFailureLoggerListener;
+import org.araport.stock.listeners.LogProcessListener;
+import org.araport.stock.listeners.LogStepStartStopListener;
+import org.araport.stock.listeners.ProtocolListener;
+import org.araport.stock.listeners.StagingStockPropertiesStepListener;
 import org.araport.stock.partitioner.StockColumnRangePartitioner;
+import org.araport.stock.policy.ExceptionSkipPolicy;
+import org.araport.stock.policy.PolicyBean;
+import org.araport.stock.policy.StockSkipListener;
+import org.araport.stock.processor.DbXrefItemProcessor;
+import org.araport.stock.processor.DbXrefItemProcessor1;
+import org.araport.stock.reader.DbXrefItemReader;
+import org.araport.stock.reader.SourceStockDrivingQueryReader;
+import org.araport.stock.reader.StockPropertiesItemReader;
+import org.araport.stock.rowmapper.DbXrefRowMapper;
+import org.araport.stock.rowmapper.StockPropertiesSourceRowMapper;
+import org.araport.stock.rowmapper.beans.RowMapperBeans;
+import org.araport.stock.tasklet.business.BulkLoadStockPropertiesTasklet;
+import org.araport.stock.tasklet.business.DbLookupTasklet;
+import org.araport.stock.tasklet.business.GeneralModuleInitTasklet;
+import org.araport.stock.tasklet.business.StockPropertiesCVTermLookupTasklet;
+import org.araport.stock.tasklet.staging.BatchSchemaInitTasklet;
+import org.araport.stock.tasklet.staging.StagingSchemaInitTasklet;
+import org.araport.stock.tasklet.staging.StagingStockPropertiesTruncateTasklet;
+import org.araport.stock.writer.DbXrefItemWriter;
+import org.araport.stock.writer.StockPropertiesJdbcBatchWriter;
 
 @Configuration
 @EnableBatchProcessing
@@ -88,15 +92,23 @@ import org.araport.stock.partitioner.StockColumnRangePartitioner;
 		StagingStockPropertiesTruncateTasklet.class,
 		BulkLoadStockPropertiesTasklet.class,
 		StockColumnRangePartitioner.class,
-		StockPropertiesJdbcBatchWriter.class, PolicyBean.class })
+		StockPropertiesJdbcBatchWriter.class, FlowBeans.class, PolicyBean.class })
 @PropertySources(value = { @PropertySource("classpath:/partition.properties") })
 public class LoadStocksJobBatchConfiguration {
 
 	private static final Logger log = Logger
 			.getLogger(LogStepStartStopListener.class);
 
+	// Main Job
 	public static final String MAIN_JOB = "mainJob";
-	
+
+	// Application Schemas
+	public static final String BATCH_SCHEMA_INITIALIZATION_STEP = "batchSchemaInitStep";
+	public static final String STAGING_DB_INITIALIZATION_STEP = "stagingSchemaInitStep";
+
+	// General Module
+	public static final String GENERAL_MODULE_INITIALIZATION_STEP = "generalModuleStep";
+
 	public static final String STOCK_MASTER_LOADING_STEP = "stockMasterLoadingStep";
 	public static final String DB_LOOKUP_LOADING_STEP = "dbLookupLoadingStep";
 	public static final String DB_CVTERM_LOADING_STEP = "dbCVTermLookupLoadingStep";
@@ -171,6 +183,15 @@ public class LoadStocksJobBatchConfiguration {
 	ItemWriter<StockProperty> stockPropertyJdbcBatchWriter;
 
 	@Autowired
+	BatchSchemaInitTasklet batchSchemaInitTasklet;
+
+	@Autowired
+	StagingSchemaInitTasklet stagingSchemaInitTasklet;
+
+	@Autowired
+	GeneralModuleInitTasklet generalModuleInitTasklet;
+
+	@Autowired
 	private TaskExecutor taskExecutor;
 
 	@Autowired
@@ -216,10 +237,12 @@ public class LoadStocksJobBatchConfiguration {
 				.listener(protocolListener())
 				// .start(stockMasterLoadingStep())
 				// .next(dbLookupLoadingStep())
-				.start(dbLookupLoadingStep()).next(stockMasterLoadingStep())
+				// .start(dbLookupLoadingStep()).next(stockMasterLoadingStep())
+				.start(batchSchemaInitStep())//.next(stagingSchemaInitStep())
+				.next(generalModuleInitStep()).next(dbLookupLoadingStep())
+				.next(stockMasterLoadingStep())
 				.next(dbStockPropertiesCVTermLookup())
 				.next(stagingStockPropertiesCleanup())
-				// .next(stockPropertiesStagingLoadingStep())
 				.next(stepStockPropertyMaster())
 				.next(dbBulkLoadingStockProperties()).build();
 	}
@@ -243,6 +266,42 @@ public class LoadStocksJobBatchConfiguration {
 	 * .writer(writer()) .listener(logProcessListener()) .faultTolerant()
 	 * .build(); }
 	 */
+
+	@Bean
+	public Step batchSchemaInitStep() {
+
+		StepBuilder stepBuilder = stepBuilders
+				.get(BATCH_SCHEMA_INITIALIZATION_STEP);
+
+		Step step = stepBuilder.tasklet(batchSchemaInitTasklet).build();
+
+		return step;
+
+	}
+
+	@Bean
+	public Step stagingSchemaInitStep() {
+
+		StepBuilder stepBuilder = stepBuilders
+				.get(STAGING_DB_INITIALIZATION_STEP);
+
+		Step step = stepBuilder.tasklet(stagingSchemaInitTasklet).build();
+
+		return step;
+
+	}
+
+	@Bean
+	public Step generalModuleInitStep() {
+
+		StepBuilder stepBuilder = stepBuilders
+				.get(GENERAL_MODULE_INITIALIZATION_STEP);
+
+		Step step = stepBuilder.tasklet(generalModuleInitTasklet).build();
+
+		return step;
+
+	}
 
 	@Bean
 	public Step stockMasterLoadingStep() {

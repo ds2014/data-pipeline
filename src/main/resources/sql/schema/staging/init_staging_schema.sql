@@ -15,8 +15,6 @@ DECLARE
     our_epoch bigint := 1314220021721;
     seq_id bigint;
     now_millis bigint;
-    -- the id of this DB shard, must be set for each
-    -- schema shard you have - you could pass this as a parameter
     shard_id int := 1;
 BEGIN  
     SELECT nextval('staging.global_id_sequence') % 1024 INTO seq_id;
@@ -73,4 +71,3 @@ AS
    END;
    $$
    LANGUAGE plpgsql;
-

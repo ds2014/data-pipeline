@@ -36,7 +36,7 @@ public class StockColumnRangePartitioner implements Partitioner {
 	private static final Logger log = Logger
 			.getLogger(StockColumnRangePartitioner.class);
 
-	private static final int PARTITIONS_PER_NODE = 5;
+	private static final int PARTITIONS_PER_NODE = 1;
 
 	@Autowired
 	DataSource targetDataSource;
@@ -101,7 +101,7 @@ public class StockColumnRangePartitioner implements Partitioner {
 	@Override
 	public Map<String, ExecutionContext> partition(int gridSize) {
 
-		int partitionCount = gridSize * PARTITIONS_PER_NODE;
+		int partitionCount = gridSize;
 		String minQuery = "SELECT MIN(" + column + ") from " + table;
 		String maxQuery = "SELECT MAX(" + column + ") from " + table;
 		String countQuery = "SELECT count(*) from " + table;
@@ -142,7 +142,7 @@ public class StockColumnRangePartitioner implements Partitioner {
 		}
 		
 		log.info("***********************************************************");
-		log.info("RESULT.SIZE = " + result.size());
+		log.info("Total Partition Count = " + result.size());
 		log.info("***********************************************************");
 		
 		return result;

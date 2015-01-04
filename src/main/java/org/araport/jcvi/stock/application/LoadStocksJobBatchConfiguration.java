@@ -190,7 +190,7 @@ public class LoadStocksJobBatchConfiguration {
 
 	// tag::jobstep[]
 	@Bean
-	public Job loadStocks() {
+	public Job loadStocks() throws Exception {
 		return jobs
 				.get("STOCK_MASTER_LOADING_STEP")
 				.listener(protocolListener())
@@ -198,7 +198,8 @@ public class LoadStocksJobBatchConfiguration {
 				// .next(dbLookupLoadingStep())
 				.start(dbLookupLoadingStep()).next(stockMasterLoadingStep())
 				.next(dbStockPropertiesCVTermLookup())
-				.next(stockPropertiesStagingLoadingStep())
+				//.next(stockPropertiesStagingLoadingStep())
+				.next(stepStockPropertyMaster())
 				.next(dbBulkLoadingStockProperties()).build();
 	}
 
@@ -234,8 +235,8 @@ public class LoadStocksJobBatchConfiguration {
 				.skip(PSQLException.class)
 				// .reader(dbXRefReader())
 				.reader(sourceStockReader).processor(stockItemProcessor)
-				.writer(stockItemWriter).taskExecutor(taskExecutor)
-				.throttleLimit(6).listener(logProcessListener()).build();
+				.writer(stockItemWriter).//taskExecutor(taskExecutor).throttleLimit(6).
+				listener(logProcessListener()).build();
 	}
 
 	@Bean
@@ -265,7 +266,8 @@ public class LoadStocksJobBatchConfiguration {
 				.writer(stockPropertyJdbcBatchWriter)
 				// .taskExecutor(taskExecutor).throttleLimit(10)
 				.listener(logProcessListener())
-				.listener(stagingStockPropertiesStepListener()).build();
+				.listener(stagingStockPropertiesStepListener())
+				.build();
 	}
 
 	@Bean
@@ -300,6 +302,8 @@ public class LoadStocksJobBatchConfiguration {
 		partitioner.setDataSource(targetDataSource);
 		partitioner.setTable("staging.stock_properties");
 		partitioner.setColumn("stock_id");
+		//partitioner.setWhereClause("stock_id in (1,2,3, 4,5, 6, 7, 8, 9, 10)");
+		//partitioner.partition(10);
 		//Map<String, ExecutionContext> partition = partitioner
 			//	.partition(gridSize);
 
@@ -363,5 +367,11 @@ public class LoadStocksJobBatchConfiguration {
 	public StagingStockPropertiesStepListener stagingStockPropertiesStepListener() {
 		return new StagingStockPropertiesStepListener();
 	}
+	
+	@Bean
+	public StockPropertiesItemReader stockPropertiesItemReaderListener(){
+		return new StockPropertiesItemReader();
+	}
+
 
 }

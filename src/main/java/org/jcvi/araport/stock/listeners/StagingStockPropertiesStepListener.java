@@ -22,67 +22,60 @@ import org.springframework.context.annotation.Import;
 import org.springframework.stereotype.Component;
 
 @Component("source_stockproperty_listener")
-@Import({ DataSourceInfrastructureConfiguration.class, DbDaoImpl.class, GeneralDaoImpl.class,
-		RowMapperBeans.class })
-public class StagingStockPropertiesStepListener implements StepExecutionListener {
+@Import({ DataSourceInfrastructureConfiguration.class, DbDaoImpl.class,
+		GeneralDaoImpl.class, RowMapperBeans.class })
+public class StagingStockPropertiesStepListener implements
+		StepExecutionListener {
 
 	private static final String TRUNCATE_STAGING_STOCKPROP_SQL_PATH = "/sql/transformations/stock_properties/truncate_staging.stockprop.sql";
 	private static final String TRUNCATE_STAGING_STOCKPROP_SQL = FileUtils
 			.getSqlFileContents(TRUNCATE_STAGING_STOCKPROP_SQL_PATH);
-	
+
 	private static final Logger log = Logger
 			.getLogger(StagingStockPropertiesStepListener.class);
 
 	@Autowired
 	DataSource targetDataSource;
-	
+
 	private GeneralDao generalDao;
-	
+
 	@Override
 	public ExitStatus afterStep(StepExecution execution) {
-		log.info("Paging Item Reader Step Test: " + execution.getStepName() + " has ended!");
+		log.info("Paging Item Reader Step Test: " + execution.getStepName()
+				+ " has ended!");
 
-        ExecutionContext jobContext = execution.getJobExecution().getExecutionContext();
-        
-        if (jobContext.containsKey(ApplicationConstants.TAIR_DB_ID)){
-        	 log.info(ApplicationConstants.TAIR_DB_ID + ": " + jobContext.get(ApplicationConstants.TAIR_DB_ID) );
-        }
-        if (jobContext.containsKey(ApplicationConstants.TAIR_STOCK_DB_ID)){
-        	 log.info(ApplicationConstants.TAIR_STOCK_DB_ID + ": " + jobContext.get(ApplicationConstants.TAIR_STOCK_DB_ID) );
-        }
-        
-         return execution.getExitStatus();
+		ExecutionContext jobContext = execution.getJobExecution()
+				.getExecutionContext();
+
+		return execution.getExitStatus();
 	}
 
 	@Override
 	public void beforeStep(StepExecution execution) {
 
-		log.info("Paging Item Reader Step Test: " +execution.getStepName() + " has begun!");
+		log.info("Paging Item Reader Step: " + execution.getStepName()
+				+ " has begun!");
 
-		ExecutionContext jobContext = execution.getJobExecution()
-				.getExecutionContext();
+		ExecutionContext stepContext = execution.getExecutionContext();
 
-		if (jobContext.containsKey(ApplicationConstants.TAIR_DB_ID)) {
-			log.info(ApplicationConstants.TAIR_DB_ID + ": "
-					+ jobContext.get(ApplicationConstants.TAIR_DB_ID));
+		stepContext.put("partitionName", execution.getStepName());
 
-		}
-		if (jobContext.containsKey(ApplicationConstants.TAIR_STOCK_DB_ID)) {
-			log.info(ApplicationConstants.TAIR_STOCK_DB_ID + ": "
-					+ jobContext.get(ApplicationConstants.TAIR_STOCK_DB_ID));
-
-		}
+		log.info("Partition: " + execution.getStepName()
+				+ "; Id Range: " + " MinValue: "
+				+ stepContext.get("minValue") + " MaxValue: "
+				+ stepContext.get("maxValue"));
 
 		// 1. Truncating Staging StockProp
+       
+		log.info("Injected Truncate Staging Stock Properties SQL:"
+				+ TRUNCATE_STAGING_STOCKPROP_SQL);
+		log.info("Truncate Staging Stock Properties Table...");
 
-			log.info("Injected Truncate Staging Stock Properties SQL:" + TRUNCATE_STAGING_STOCKPROP_SQL);
-			log.info("Truncate Staging Stock Properties Table...");
+		generalDao.executeSQL(TRUNCATE_STAGING_STOCKPROP_SQL);
+		
 
-			generalDao.executeSQL(TRUNCATE_STAGING_STOCKPROP_SQL);
-			
-			
 	}
-	
+
 	@PostConstruct
 	public void setDao() {
 

@@ -23,21 +23,27 @@ import org.jcvi.araport.stock.tasklet.BulkLoadStockPropertiesTasklet;
 import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.StepExecutionListener;
+import org.springframework.batch.core.annotation.AfterStep;
+import org.springframework.batch.core.annotation.BeforeStep;
 import org.springframework.batch.core.configuration.annotation.StepScope;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.database.JdbcPagingItemReader;
 import org.springframework.batch.item.database.Order;
 import org.springframework.batch.item.database.support.PostgresPagingQueryProvider;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
+import org.springframework.context.annotation.PropertySource;
+import org.springframework.context.annotation.PropertySources;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 @Component("source_stockproperty_reader")
-@Import({ DataSourceInfrastructureConfiguration.class, DbDaoImpl.class, 
+@Import({ DataSourceInfrastructureConfiguration.class, DbDaoImpl.class,
 		RowMapperBeans.class })
-public class StockPropertiesItemReader implements StepExecutionListener {
+@PropertySources(value = { @PropertySource("classpath:/partition.properties") })
+public class StockPropertiesItemReader {
 
 	private static final Logger log = Logger
 			.getLogger(StockPropertiesItemReader.class);
@@ -47,12 +53,16 @@ public class StockPropertiesItemReader implements StepExecutionListener {
 
 	@Autowired
 	StockPropertiesSourceRowMapper stockPropertiesSourceMapper;
-	
-	
+
+	private int minValue;
+	private int maxValue;
+
 	@Bean
-	// @Scope("prototype")
 	@StepScope
-	public JdbcPagingItemReader<StockPropertySource> sourceStockPropertyReader()
+	public JdbcPagingItemReader<StockPropertySource> sourceStockPropertyReader(
+			@Value("#{stepExecutionContext['minValue']}") long minValue,
+			@Value("#{stepExecutionContext['maxValue']}") long maxValue,
+			@Value("#{stepExecutionContext['partitionName']}") String partitionName)
 			throws Exception {
 
 		PostgresPagingQueryProvider provider = new PostgresPagingQueryProvider();
@@ -62,57 +72,28 @@ public class StockPropertiesItemReader implements StepExecutionListener {
 		Map<String, Order> sortKeys = new HashMap<String, Order>();
 		sortKeys.put("stock_id", Order.ASCENDING);
 		provider.setSortKeys(sortKeys);
-
-		//provider.setWhereClause("stock_id in (1,2)");
+		
+	   // provider.setWhereClause("stock_id >= :minValue and stock_id <= :maxValue and stock_id in (1,2,3, 4,5, 6, 7, 8, 9, 10)");
+	    provider.setWhereClause("stock_id >= :minValue and stock_id <= :maxValue");
 
 		JdbcPagingItemReader<StockPropertySource> reader = new JdbcPagingItemReader<StockPropertySource>();
 		reader.setDataSource(targetDataSource);
 		reader.setQueryProvider(provider);
+		
+		Map<String, Object> params = new HashMap<String, Object>();
+		params.put("minValue", minValue);
+		params.put("maxValue", maxValue);
+		reader.setParameterValues(params);
+				
 		reader.setPageSize(1000);
 		reader.setRowMapper(stockPropertiesSourceMapper);
-		reader.setSaveState(false);
+		//reader.setSaveState(false);
 		reader.afterPropertiesSet();
+
+		log.info("Partition: " + partitionName + "; Id Range: " + "MinValue: "
+				+ minValue + " MaxValue: " + maxValue);
 
 		return reader;
 	}
 
-	@Override
-	public ExitStatus afterStep(StepExecution execution) {
-		log.info("Paging Item Reader Step: " + execution.getStepName() + " has ended!");
-
-        ExecutionContext jobContext = execution.getJobExecution().getExecutionContext();
-        
-        if (jobContext.containsKey(ApplicationConstants.TAIR_DB_ID)){
-        	 log.info(ApplicationConstants.TAIR_DB_ID + ": " + jobContext.get(ApplicationConstants.TAIR_DB_ID) );
-        }
-        if (jobContext.containsKey(ApplicationConstants.TAIR_STOCK_DB_ID)){
-        	 log.info(ApplicationConstants.TAIR_STOCK_DB_ID + ": " + jobContext.get(ApplicationConstants.TAIR_STOCK_DB_ID) );
-        }
-        
-       return execution.getExitStatus();
-	}
-
-	@Override
-	public void beforeStep(StepExecution execution) {
-
-		log.info("Paging Item Reader Step: " +execution.getStepName() + " has begun!");
-
-		ExecutionContext jobContext = execution.getJobExecution()
-				.getExecutionContext();
-
-		if (jobContext.containsKey(ApplicationConstants.TAIR_DB_ID)) {
-			log.info(ApplicationConstants.TAIR_DB_ID + ": "
-					+ jobContext.get(ApplicationConstants.TAIR_DB_ID));
-
-		}
-		if (jobContext.containsKey(ApplicationConstants.TAIR_STOCK_DB_ID)) {
-			log.info(ApplicationConstants.TAIR_STOCK_DB_ID + ": "
-					+ jobContext.get(ApplicationConstants.TAIR_STOCK_DB_ID));
-
-		}
-
-				
-	}
-	
-	
 }

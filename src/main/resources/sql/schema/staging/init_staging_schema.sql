@@ -6,6 +6,7 @@ SET search_path = chado, public, batch, tair_stg, staging;
 DROP TABLE IF EXISTS staging.stockprop CASCADE;
 DROP MATERIALIZED VIEW IF EXISTS staging.stock_properties_all CASCADE;
 DROP MATERIALIZED VIEW IF EXISTS staging.stock_properties CASCADE;
+DROP MATERIALIZED VIEW IF EXISTS staging.tair_non_existing_stocks;
 
 DROP SEQUENCE IF EXISTS staging.global_id_sequence CASCADE;
 CREATE SEQUENCE staging.global_id_sequence;

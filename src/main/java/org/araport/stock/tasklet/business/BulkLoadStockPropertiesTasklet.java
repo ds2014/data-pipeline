@@ -80,21 +80,14 @@ public class BulkLoadStockPropertiesTasklet implements Tasklet {
 	public RepeatStatus execute(StepContribution step, ChunkContext context)
 			throws Exception {
 
-		// 1. Alter Chado Stock Properties to accomodate long data types
-
-		log.info("Injected Alter SQL:" + ALTER_CHADO_STOCKPROP_SQL);
-		log.info("Altering Chado Stock Properties...");
-
-		generalDao.executeSQL(ALTER_CHADO_STOCKPROP_SQL);
-
-		// 2. Copy loaded Stock Properties to Staging Backup Properties Table
+		// 1. Copy loaded Stock Properties to Staging Backup Properties Table
 		log.info("Injected Create Stock Properties Backup SQL:"
 				+ CREATE_STAGING_BK_STOCKPROP_SQL);
 		log.info("Creating Stock Properties Backup...");
 
 		generalDao.executeSQL(CREATE_STAGING_BK_STOCKPROP_SQL);
 
-		// 3. Enable Constraints on Staging Backup Properties Table
+		// 2. Enable Constraints on Staging Backup Properties Table
 		log.info("Injected Enable Constraints on Staging Backup Properties Table SQL:"
 				+ ENABLE_STAGING_BK_CONSTRAINTS_SQL);
 
@@ -102,35 +95,35 @@ public class BulkLoadStockPropertiesTasklet implements Tasklet {
 
 		generalDao.executeSQL(ENABLE_STAGING_BK_CONSTRAINTS_SQL);
 
-		// 4. Truncate Chado Stock Properties
+		// 3. Truncate Chado Stock Properties
 		log.info("Injected Truncate Chado Stock Properties SQL:"
 				+ TRUNCATE_CHADO_STOCKPROP_SQL);
 		log.info("Truncating Chado Stock Properties Table...");
 
 		generalDao.executeSQL(TRUNCATE_CHADO_STOCKPROP_SQL);
 
-		// 5. Disable Constraints on Chado Stock Properties
+		// 4. Disable Constraints on Chado Stock Properties
 		log.info("Injected Disable Constraints on Chado Stock Properties SQL:"
 				+ DISABLE_CONSTRAINTS_CHADO_STOCKPROP_SQL);
 		log.info("Disabling Constraints on the Chado Stock Properties Table...");
 
 		generalDao.executeSQL(DISABLE_CONSTRAINTS_CHADO_STOCKPROP_SQL);
 
-		// 6. Populate Chado Stock Properties Table
+		// 5. Populate Chado Stock Properties Table
 		log.info("Populate Chado Stock Properties Table SQL:"
 				+ POPULATE_CHADO_STOCKPROP_SQL);
 		log.info("Populating Chado Stock Properties Table...");
 
 		generalDao.executeSQL(POPULATE_CHADO_STOCKPROP_SQL);
 
-		// 7. Enable Constraints on Chado Stock Properties Table
+		// 8. Enable Constraints on Chado Stock Properties Table
 		log.info("Injected Enable Constraints on Chado Stock Properties Table SQL:"
 				+ ENABLE_CONSTRAINTS_CHADO_STOCKPROP_SQL);
 		log.info("Enabling Constraints on Chado Stock Properties Table...");
 
 		generalDao.executeSQL(ENABLE_CONSTRAINTS_CHADO_STOCKPROP_SQL);
 
-		// 8. Create Indexes on Chado Stock Properties Table
+		// 9. Create Indexes on Chado Stock Properties Table
 		log.info("Injected Create Indexes on Chado Stock Properties Table SQL:"
 				+ CREATE_INDEXES_CHADO_STOCKPROP_SQL);
 		log.info("Creating Indexes on Chado Stock Properties Table...");

@@ -84,6 +84,7 @@ import org.araport.stock.tasklet.staging.BatchSchemaInitTasklet;
 import org.araport.stock.tasklet.staging.StageDbXrefExistingStockAccessionsTasklet;
 import org.araport.stock.tasklet.staging.StagingSchemaInitTasklet;
 import org.araport.stock.tasklet.staging.StagingStockPropertiesTruncateTasklet;
+import org.araport.stock.tasklet.staging.StockStagingPreloadingTasklet;
 import org.araport.stock.writer.DbXrefItemWriter;
 import org.araport.stock.writer.DbXrefJdbcBatchWriter;
 import org.araport.stock.writer.StockPropertiesJdbcBatchWriter;
@@ -120,9 +121,13 @@ public class LoadStocksJobBatchConfiguration {
 	public static final String DBXREF_PRIMARY_ACCESSIONS_SLAVE_LOADING_STEP = "dbXRefPrimaryAcessionsSlaveLoadingStep";
 	public static final String DBXREF_PRIMARY_ACCESSIONS_POST_LOADING_STEP = "dbXRefPrimaryAcessionsPostLoadingStep";
 	
-	
-		
+	//Stocks
+	public static final String STOCKS_STAGING_STEP = "stockStagingStep";
 	public static final String STOCK_MASTER_LOADING_STEP = "stockMasterLoadingStep";
+	public static final String STOCK_SLAVE_LOADING_STEP = "stockSlaveLoadingStep";
+	public static final String STOCK_POST_LOADING_STEP = "stockPostLoadingStep";
+	
+
 	public static final String DB_LOOKUP_LOADING_STEP = "dbLookupLoadingStep";
 	public static final String DB_CVTERM_LOADING_STEP = "dbCVTermLookupLoadingStep";
 	public static final String STOCK_CROSSREFERENCES_LOADING_STEP = "stockCrossReferencesLoadingStep";
@@ -237,6 +242,9 @@ public class LoadStocksJobBatchConfiguration {
 	
 	@Autowired
 	DbXrefPrimaryStockAccessionsPostLoadTasklet dbXrefPrimaryAccessionsPostLoadTasklet;
+	
+	@Autowired
+	StockStagingPreloadingTasklet dbStockStagingPreloadingTasklet;
 
 	@Autowired
 	private TaskExecutor taskExecutor;
@@ -290,11 +298,13 @@ public class LoadStocksJobBatchConfiguration {
 				.next(stageDbXrefExistingStockAccessionsStep())
 				.next(dbXrefMasterLoadingStep())
 				.next(dbXrefPrimaryAccessionsPostLoadingStep())
+				.next(stockStagingPreloadingTasklet())
 				//.next(stockMasterLoadingStep())
 				//.next(dbStockPropertiesCVTermLookup())
 				//.next(stagingStockPropertiesCleanup())
 				//.next(stepStockPropertyMaster())
-				.next(dbBulkLoadingStockProperties()).build();
+				//.next(dbBulkLoadingStockProperties())
+				.build();
 	}
 
 	/*
@@ -449,6 +459,12 @@ public class LoadStocksJobBatchConfiguration {
 	public Step dbXrefPrimaryAccessionsPostLoadingStep() {
 		return stepBuilders.get(DBXREF_PRIMARY_ACCESSIONS_POST_LOADING_STEP)
 				.tasklet(dbXrefPrimaryAccessionsPostLoadTasklet).build();
+	}
+	
+	@Bean
+	public Step stockStagingPreloadingTasklet() {
+		return stepBuilders.get(STOCKS_STAGING_STEP)
+				.tasklet(dbStockStagingPreloadingTasklet).build();
 	}
 	
 		

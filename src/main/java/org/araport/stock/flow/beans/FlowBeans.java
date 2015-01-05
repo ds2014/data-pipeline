@@ -31,4 +31,10 @@ public class FlowBeans {
 	public DbXrefPrimaryStockAccessionsPostLoadTasklet dbXrefPrimaryAccessionsPostLoadTasklet(){
 		return new DbXrefPrimaryStockAccessionsPostLoadTasklet();
 	}
+	
+	@Bean
+	public StockStagingPreloadingTasklet dbStockStagingPreloadingTasklet(){
+		return new StockStagingPreloadingTasklet();
+	}
+	
 }

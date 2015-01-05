@@ -11,6 +11,7 @@ import org.araport.stock.rowmapper.SourceStockDrivingQueryRowMapper;
 import org.araport.stock.rowmapper.StockPropertiesSourceRowMapper;
 import org.araport.stock.rowmapper.StockPropertyRowMapper;
 import org.araport.stock.rowmapper.StockRowMapper;
+import org.araport.stock.rowmapper.StockSourceRowMapper;
 import org.araport.stock.writer.StockItemWriter;
 import org.araport.stock.writer.StockPropertyItemWriter;
 import org.springframework.batch.item.database.JdbcPagingItemReader;
@@ -73,6 +74,11 @@ public class RowMapperBeans {
 	@Bean
 	public DbXrefBatchProcessor dbXrefBatchProcessor(){
 		return new DbXrefBatchProcessor();
+	}
+	
+	@Bean 
+	public 	StockSourceRowMapper stockSourceRowMapper(){
+		return new StockSourceRowMapper();
 	}
 		
 }

@@ -1,3 +1,4 @@
+DROP MATERIALIZED VIEW IF EXISTS staging.tair_non_existing_stocks CASCADE;
 CREATE MATERIALIZED VIEW staging.tair_non_existing_stocks AS
 	WITH source AS(
 SELECT

@@ -80,6 +80,7 @@ import org.araport.stock.tasklet.business.BulkLoadStockPropertiesTasklet;
 import org.araport.stock.tasklet.business.DbLookupTasklet;
 import org.araport.stock.tasklet.business.DbXrefPrimaryStockAccessionsPostLoadTasklet;
 import org.araport.stock.tasklet.business.GeneralModuleInitTasklet;
+import org.araport.stock.tasklet.business.StockPostLoadingTasklet;
 import org.araport.stock.tasklet.business.StockPropertiesCVTermLookupTasklet;
 import org.araport.stock.tasklet.staging.BatchSchemaInitTasklet;
 import org.araport.stock.tasklet.staging.StageDbXrefExistingStockAccessionsTasklet;
@@ -99,6 +100,7 @@ import org.araport.stock.writer.StockPropertiesJdbcBatchWriter;
 		StockPropertiesCVTermLookupTasklet.class,
 		StagingStockPropertiesTruncateTasklet.class,
 		BulkLoadStockPropertiesTasklet.class,
+		StockPostLoadingTasklet.class,
 		StockColumnRangePartitioner.class,
 		StockPropertiesJdbcBatchWriter.class, DbXrefJdbcPagingItemReader.class, StockSourceJdbcPagingItemReader.class, DbXrefJdbcBatchWriter.class, StockJdbcBatchWriter.class, FlowBeans.class, PolicyBean.class })
 @PropertySources(value = { @PropertySource("classpath:/partition.properties") })
@@ -273,6 +275,9 @@ public class LoadStocksJobBatchConfiguration {
 	
 	@Autowired
 	StockStagingPreloadingTasklet dbStockStagingPreloadingTasklet;
+	
+	@Autowired
+	public StockPostLoadingTasklet stockPostLoadingTasklet;
 
 	@Autowired
 	private TaskExecutor taskExecutor;
@@ -328,6 +333,7 @@ public class LoadStocksJobBatchConfiguration {
 				.next(dbXrefPrimaryAccessionsPostLoadingStep())
 				.next(stockStagingPreloadingTasklet())
 				.next(stockSourceMasterLoadingStep())
+				.next(stockPostLoadingTasklet())
 				//.next(stockMasterLoadingStep())
 				//.next(dbStockPropertiesCVTermLookup())
 				//.next(stagingStockPropertiesCleanup())
@@ -420,6 +426,7 @@ public class LoadStocksJobBatchConfiguration {
 				.writer(stockItemWriter).listener(logProcessListener()).build();
 	}
 
+		
 	@Bean
 	public Step dbLookupLoadingStep() {
 		return stepBuilders.get(DB_LOOKUP_LOADING_STEP)
@@ -527,6 +534,12 @@ public class LoadStocksJobBatchConfiguration {
 	public Step stockStagingPreloadingTasklet() {
 		return stepBuilders.get(STOCKS_STAGING_STEP)
 				.tasklet(dbStockStagingPreloadingTasklet).build();
+	}
+	
+	@Bean
+	public Step stockPostLoadingTasklet() {
+		return stepBuilders.get(STOCK_POST_LOADING_STEP)
+				.tasklet(stockPostLoadingTasklet).build();
 	}
 	
 		

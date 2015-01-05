@@ -2,6 +2,7 @@ package org.araport.stock.flow.beans;
 
 import org.araport.stock.tasklet.business.GeneralModuleInitTasklet;
 import org.araport.stock.tasklet.business.DbXrefPrimaryStockAccessionsPostLoadTasklet;
+import org.araport.stock.tasklet.business.StockPostLoadingTasklet;
 import org.araport.stock.tasklet.staging.*;
 import org.springframework.context.annotation.Bean;
 
@@ -35,6 +36,11 @@ public class FlowBeans {
 	@Bean
 	public StockStagingPreloadingTasklet dbStockStagingPreloadingTasklet(){
 		return new StockStagingPreloadingTasklet();
+	}
+	
+	@Bean
+	public StockPostLoadingTasklet stockPostLoadingTasklet(){
+		return new StockPostLoadingTasklet();
 	}
 	
 }

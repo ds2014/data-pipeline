@@ -64,11 +64,12 @@ public class StageDbXrefExistingStockAccessionsTasklet implements Tasklet {
 
 		generalDao.executeSQL(DISABLE_DBXREF_CONSTRAINTS_SQL);
 
-		log.info("Injected: Delete Existing Stock Accessions from DbXref Table SQL:"
-				+ DELETE_EXISTING_ACCESSIONS_DBXREF_SQL);
-		log.info("Deleting Existing Stock Accessions from DbXref Table ...");
+		// Should not clear DbXref since they might be used by Loaded Stocks
+		//log.info("Injected: Delete Existing Stock Accessions from DbXref Table SQL:"
+			//	+ DELETE_EXISTING_ACCESSIONS_DBXREF_SQL);
+		//log.info("Deleting Existing Stock Accessions from DbXref Table ...");
 
-		generalDao.executeSQL(DELETE_EXISTING_ACCESSIONS_DBXREF_SQL);
+	//	generalDao.executeSQL(DELETE_EXISTING_ACCESSIONS_DBXREF_SQL);
 
 		log.info("Injected: Create Non Existing Stock Accessions Materialized View SQL:"
 				+ CREATE_NOT_EXISTING_STOCK_ACCESSIONS_DBXREF_SQL);

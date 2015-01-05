@@ -31,7 +31,7 @@ public class StockJdbcBatchWriter {
 	private static final String INSERT_NAMED_PARAM_SQL = FileUtils.getSqlFileContents(INSERT_NAMED_PARAM_SQL_PATH);
 	
 	@Bean
-	public ItemWriter<Stock> stockPropertyJdbcBatchWriter(){
+	public ItemWriter<Stock> stockJdbcBatchWriter(){
 		
 		JdbcBatchItemWriter<Stock> itemWriter = new JdbcBatchItemWriter<Stock>();
 		itemWriter.setSql(INSERT_NAMED_PARAM_SQL);

@@ -82,7 +82,7 @@ public class StockSourceJdbcPagingItemReader {
 	
 	@Bean
 	@StepScope
-	public JdbcPagingItemReader<Stock> sourceStock(
+	public JdbcPagingItemReader<Stock> sourceStockBatchReader(
 			@Value("#{stepExecutionContext['minValue']}") long minValue,
 			@Value("#{stepExecutionContext['maxValue']}") long maxValue,
 			@Value("#{stepExecutionContext['partitionName']}") String partitionName)

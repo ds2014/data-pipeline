@@ -72,6 +72,7 @@ import org.araport.stock.reader.DbXrefItemReader;
 import org.araport.stock.reader.DbXrefJdbcPagingItemReader;
 import org.araport.stock.reader.SourceStockDrivingQueryReader;
 import org.araport.stock.reader.StockPropertiesItemReader;
+import org.araport.stock.reader.StockSourceJdbcPagingItemReader;
 import org.araport.stock.rowmapper.DbXrefRowMapper;
 import org.araport.stock.rowmapper.StockPropertiesSourceRowMapper;
 import org.araport.stock.rowmapper.beans.RowMapperBeans;
@@ -87,6 +88,7 @@ import org.araport.stock.tasklet.staging.StagingStockPropertiesTruncateTasklet;
 import org.araport.stock.tasklet.staging.StockStagingPreloadingTasklet;
 import org.araport.stock.writer.DbXrefItemWriter;
 import org.araport.stock.writer.DbXrefJdbcBatchWriter;
+import org.araport.stock.writer.StockJdbcBatchWriter;
 import org.araport.stock.writer.StockPropertiesJdbcBatchWriter;
 
 @Configuration
@@ -98,7 +100,7 @@ import org.araport.stock.writer.StockPropertiesJdbcBatchWriter;
 		StagingStockPropertiesTruncateTasklet.class,
 		BulkLoadStockPropertiesTasklet.class,
 		StockColumnRangePartitioner.class,
-		StockPropertiesJdbcBatchWriter.class, DbXrefJdbcPagingItemReader.class, DbXrefJdbcBatchWriter.class, FlowBeans.class, PolicyBean.class })
+		StockPropertiesJdbcBatchWriter.class, DbXrefJdbcPagingItemReader.class, StockSourceJdbcPagingItemReader.class, DbXrefJdbcBatchWriter.class, StockJdbcBatchWriter.class, FlowBeans.class, PolicyBean.class })
 @PropertySources(value = { @PropertySource("classpath:/partition.properties") })
 public class LoadStocksJobBatchConfiguration {
 
@@ -123,6 +125,7 @@ public class LoadStocksJobBatchConfiguration {
 	
 	//Stocks
 	public static final String STOCKS_STAGING_STEP = "stockStagingStep";
+	public static final String STOCK_MASTER_STEP = "stockMasterLoadingStep";
 	public static final String STOCK_MASTER_LOADING_STEP = "stockMasterLoadingStep";
 	public static final String STOCK_SLAVE_LOADING_STEP = "stockSlaveLoadingStep";
 	public static final String STOCK_POST_LOADING_STEP = "stockPostLoadingStep";
@@ -145,6 +148,22 @@ public class LoadStocksJobBatchConfiguration {
 
 	@Autowired
 	private ResourceLoader resourceLoader;
+	
+	// Stock Partition
+	@Value("${stock.partitioner.table}")
+	private String stockPartitionerTable;
+
+	@Value("${stock.partitioner.where.clause}")
+	private String stockPartitionerWhereClause;
+
+	@Value("${stock.partitioner.column}")
+	private String stockPartitionerColumn;
+
+	@Value("${stock.partition.size}")
+	private int stockPartitionCount;
+
+	@Value("${stock.chunk.size}")
+	private int stockChunkSize;
 
 	// Stock Properties Partition
 	@Value("${stockprop.partitioner.table}")
@@ -203,6 +222,9 @@ public class LoadStocksJobBatchConfiguration {
 	
 	@Autowired
 	JdbcPagingItemReader<DbXrefSource> dbXrefJdbcItemReader;
+	
+	@Autowired
+	JdbcPagingItemReader<Stock> sourceStockBatchReader;
 
 	@Autowired
 	StockPropertiesSourceRowMapper stockPropertiesSourceMapper;
@@ -212,6 +234,9 @@ public class LoadStocksJobBatchConfiguration {
 
 	@Autowired
 	private ItemProcessor<StockPropertySource, StockProperty> stockPropertyItemProcessor;
+	
+	@Autowired
+	private ItemProcessor <Stock, Stock> stockBatchItemProcessor;
 
 	@Autowired
 	private ItemWriter<Stock> stockItemWriter;
@@ -224,6 +249,9 @@ public class LoadStocksJobBatchConfiguration {
 	
 	@Autowired
 	ItemWriter<DbXref> dbXrefJdbcBatchWriter;
+	
+	@Autowired
+	ItemWriter<Stock> stockJdbcBatchWriter;
 	
 	@Autowired
 	ItemProcessor <DbXrefSource, DbXref> dbXrefBatchProcessor;
@@ -299,6 +327,7 @@ public class LoadStocksJobBatchConfiguration {
 				.next(dbXrefMasterLoadingStep())
 				.next(dbXrefPrimaryAccessionsPostLoadingStep())
 				.next(stockStagingPreloadingTasklet())
+				.next(stockSourceMasterLoadingStep())
 				//.next(stockMasterLoadingStep())
 				//.next(dbStockPropertiesCVTermLookup())
 				//.next(stagingStockPropertiesCleanup())
@@ -454,6 +483,39 @@ public class LoadStocksJobBatchConfiguration {
 				.listener(stagingStockPropertiesStepListener()).build();
 	}
 
+	@Bean
+	public Step stockSourceMasterLoadingStep() throws Exception {
+
+		StepBuilder stepStockMaster = stepBuilders
+				.get(STOCK_MASTER_STEP);
+
+		log.info("Grid Partition Count: " + stockPartitionCount);
+
+		Step masterStep = stepStockMaster
+				.partitioner(stockSlaveLoadingStep())
+				.partitioner(STOCK_SLAVE_LOADING_STEP,
+						stockSourceColumnRangePartitioner())
+				.gridSize(stockPartitionCount)
+				.taskExecutor(concurrentExecutor).build();
+
+		return masterStep;
+	}
+		
+	@Bean
+	public Step stockSlaveLoadingStep() {
+		return stepBuilders
+				.get(STOCK_SLAVE_LOADING_STEP)
+				.listener(stepStartStopListener())
+				.<Stock, Stock> chunk(stockChunkSize)
+				.faultTolerant()
+				.skipPolicy(exceptionSkipPolicy)
+				.skip(org.springframework.dao.DataIntegrityViolationException.class)
+				.skip(PSQLException.class).reader(sourceStockBatchReader)
+				.processor(stockBatchItemProcessor)
+				.writer(stockJdbcBatchWriter)
+				.listener(logProcessListener())
+				.listener(stagingStockPropertiesStepListener()).build();
+	}
 	
 	@Bean
 	public Step dbXrefPrimaryAccessionsPostLoadingStep() {
@@ -526,6 +588,17 @@ public class LoadStocksJobBatchConfiguration {
 		
 		return partitioner;
 	}
+	
+	@Bean
+	public StockColumnRangePartitioner stockSourceColumnRangePartitioner() {
+		StockColumnRangePartitioner partitioner = new StockColumnRangePartitioner();
+		partitioner.setDataSource(targetDataSource);
+		partitioner.setTable(stockPartitionerTable);
+		partitioner.setColumn(stockPartitionerColumn);
+		
+		return partitioner;
+	}
+
 
 	@Bean
 	public Step stepStockPropertyMaster() throws Exception {

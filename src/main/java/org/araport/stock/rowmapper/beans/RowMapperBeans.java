@@ -1,7 +1,9 @@
 package org.araport.stock.rowmapper.beans;
 
+import org.araport.stock.domain.Stock;
 import org.araport.stock.domain.StockPropertySource;
 import org.araport.stock.processor.DbXrefBatchProcessor;
+import org.araport.stock.processor.StockBatchItemProcessor;
 import org.araport.stock.processor.StockItemProcessor;
 import org.araport.stock.processor.StockPropertyItemProcessor;
 import org.araport.stock.reader.StockPropertiesItemReader;
@@ -13,7 +15,9 @@ import org.araport.stock.rowmapper.StockPropertyRowMapper;
 import org.araport.stock.rowmapper.StockRowMapper;
 import org.araport.stock.rowmapper.StockSourceRowMapper;
 import org.araport.stock.writer.StockItemWriter;
+import org.araport.stock.writer.StockJdbcBatchWriter;
 import org.araport.stock.writer.StockPropertyItemWriter;
+import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.database.JdbcPagingItemReader;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Scope;
@@ -41,6 +45,12 @@ public class RowMapperBeans {
 	}
 	
 	@Bean
+	public StockBatchItemProcessor stockBatchItemProcessor(){
+		return new StockBatchItemProcessor();
+	}
+	
+	
+	@Bean
 	public StockItemWriter stockItemWriter(){
 		return new StockItemWriter();
 	}
@@ -50,6 +60,10 @@ public class RowMapperBeans {
 		return new StockPropertyItemWriter();
 	}
 	
+	@Bean 
+	public StockJdbcBatchWriter stockJdbcBatchWriter(){
+		return new StockJdbcBatchWriter();
+	}
 	
 	@Bean
 	public StockPropertiesSourceRowMapper stockPropertiesSourceMapper(){

@@ -1,0 +1,84 @@
+select * from organism o;
+
+
+SELECT
+	*
+FROM
+	tair_stg.speciesvariant sp where sp.speciesvariant_type = 'ecotype';
+	
+select count(*) from tair_stg.germplasm g
+join tair_stg.speciesvariant sp
+on sp.species_variant_id = g.species_variant_id;
+
+
+select distinct t.genus || ' ' || t.species taxon_name, sp.species_variant_id, sp.abbrev_name, sp.speciesvariant_type from tair_stg.germplasm g
+join tair_stg.speciesvariant sp
+join tair_stg.taxon t
+on 
+t.taxon_id = sp.taxon_id
+on sp.species_variant_id = g.species_variant_id;
+
+select distinct sp.speciesvariant_type
+on sp.species_variant_id = g.species_variant_id;
+
+select count (distinct sp.species_variant_id) from tair_stg.germplasm g
+join tair_stg.speciesvariant sp
+on sp.species_variant_id = g.species_variant_id;
+
+select distinct t.genus || ' ' || t.species taxon_name, sp.species_variant_id, sp.abbrev_name, sp.speciesvariant_type from tair_stg.germplasm g
+join tair_stg.speciesvariant sp
+join tair_stg.taxon t
+on 
+t.taxon_id = sp.taxon_id
+on sp.species_variant_id = g.species_variant_id and t.taxon_id <> 1;
+
+SELECT
+	distinct t.taxon_id,
+	t.common_name,
+	t.genus,
+	t.species,
+	substring(t.genus,1,1) || '.' ||  substring(t.species,1) as abbreviation,
+	sp.species_variant_id,
+	sp.speciesvariant_type,
+	sp.abbrev_name,
+	sp.name ,
+	sp.original_name
+	
+FROM
+	tair_stg.germplasm g 
+	JOIN tair_stg.speciesvariant sp 
+	on sp.species_variant_id = g.species_variant_id
+	JOIN tair_stg.taxon t
+		ON
+		t.taxon_id = sp.taxon_id;
+
+
+
+
+
+select g.*, sp.*, t.genus from tair_stg.germplasm g
+join tair_stg.speciesvariant sp
+join tair_stg.taxon t
+on 
+t.taxon_id = sp.taxon_id
+on sp.species_variant_id = g.species_variant_id and t.taxon_id <> 1;
+
+
+select distinct t.taxon_id, t.genus || ' ' || t.species taxon_name, sp.species_variant_id, sp.abbrev_name, sp.speciesvariant_type from tair_stg.germplasm g
+join tair_stg.speciesvariant sp
+join tair_stg.taxon t
+on 
+t.taxon_id = sp.taxon_id
+on sp.species_variant_id = g.species_variant_id and t.taxon_id <> 1;
+
+select * from tair_stg.taxon t where t.taxon_id =1;
+
+select * from tair_stg.taxon t order by common_name;
+
+select * from organism o;
+
+select * from organism o where o.infraspecific_name is not null
+order by o.infraspecific_name asc;
+
+select count(*) from organism o where o.infraspecific_name is not null;
+

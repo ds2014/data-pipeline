@@ -29,8 +29,8 @@ FROM
 		ON
 		sp.species_variant_id = g.species_variant_id JOIN tair_stg.taxon t
 		ON
-		t.taxon_id = sp.taxon_id),
-result_source as (		
+		t.taxon_id = sp.taxon_id)
+ 	
 SELECT
 	*
 FROM
@@ -45,51 +45,11 @@ FROM
 		dbx.dbxref_id = c.dbxref_id JOIN chado.db
 		ON
 		dbx.db_id = db.db_id
-WHERE
+		WHERE
 	db.name = 'TAIR Species Variant')
 	v
 		ON
-		v.name = s.type ),
-upd as	(
-UPDATE
-	chado.dbxref dbx
-SET
-    db_id = s.db_id,
-	accession = s.accession,
-	version = '',
-	description = 'Ecotype accession'
-FROM
-	result_source s
-WHERE
-	dbx.accession = s.accession and dbx.db_id = s.db_id
-	RETURNING 
-	dbx.dbxref_id,
-	dbx.db_id,
-	dbx.accession
-)
-	
-	INSERT
-	INTO chado.dbxref (
-	db_id,
-	accession,
-	version,
-	description
-	)
-SELECT
-	s.db_id,
-	s.accession,
-	'',
-	'Ecotype accession'
-	FROM
-	result_source s
-		LEFT JOIN
-		upd t
-		ON
-		t.accession = s.accession and t.db_id = s.db_id
-WHERE
-	(t.accession IS NULL and t.db_id is null)
-GROUP BY
-    t.dbxref_id,
-    s.db_id,
-	s.accession
-	;
+		v.name = s.type
+		join
+		dbxref acc
+		on s.accession = acc.accession and acc.db_id = v.db_id

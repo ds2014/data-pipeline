@@ -29,11 +29,11 @@ FROM
 		ON
 		sp.species_variant_id = g.species_variant_id JOIN tair_stg.taxon t
 		ON
-		t.taxon_id = sp.taxon_id)
- 	
+		t.taxon_id = sp.taxon_id),
+result_source as ( 	
 SELECT
-	*
-FROM
+	s.*, v.*, acc.*, o.*
+	FROM
 	source s JOIN (
 SELECT
 	c.name,
@@ -53,3 +53,41 @@ FROM
 		join
 		dbxref acc
 		on s.accession = acc.accession and acc.db_id = v.db_id
+		join
+		organism o 
+		on
+		o.infraspecific_name = s.infraspecific_name ),
+		
+upd as	(
+UPDATE
+	chado.organism_dbxref od
+SET
+    organism_id = s.organism_id,
+	dbxref_id = s.dbxref_id	
+FROM
+	result_source s
+WHERE
+	od.organism_id = s.organism_id and od.dbxref_id = s.dbxref_id 
+	RETURNING 
+	od.organism_id,
+	od.dbxref_id
+	)
+INSERT
+	INTO organism_dbxref (
+	organism_id,
+	dbxref_id
+	)
+SELECT
+	s.organism_id,
+	s.dbxref_id
+FROM
+	result_source s
+		LEFT JOIN
+		upd t
+		ON
+		t.organism_id = s.organism_id and t.dbxref_id = s.dbxref_id
+WHERE
+	(t.organism_id IS NULL and t.dbxref_id is NULL)
+GROUP BY
+    s.organism_id,
+	s.organism_id;

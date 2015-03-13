@@ -90,4 +90,4 @@ WHERE
 	(t.organism_id IS NULL and t.dbxref_id is NULL)
 GROUP BY
     s.organism_id,
-	s.organism_id;
+	s.dbxref_id;

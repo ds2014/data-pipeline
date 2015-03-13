@@ -76,6 +76,7 @@ import org.araport.stock.reader.StockSourceJdbcPagingItemReader;
 import org.araport.stock.rowmapper.DbXrefRowMapper;
 import org.araport.stock.rowmapper.StockPropertiesSourceRowMapper;
 import org.araport.stock.rowmapper.beans.RowMapperBeans;
+import org.araport.stock.tasklet.business.BulkLoadOrganismTasklet;
 import org.araport.stock.tasklet.business.BulkLoadStockPropertiesTasklet;
 import org.araport.stock.tasklet.business.DbLookupTasklet;
 import org.araport.stock.tasklet.business.DbXrefPrimaryStockAccessionsPostLoadTasklet;
@@ -118,6 +119,9 @@ public class LoadStocksJobBatchConfiguration {
 
 	// General Module
 	public static final String GENERAL_MODULE_INITIALIZATION_STEP = "generalModuleStep";
+	
+	//Organism
+	public static final String ORGANISM_LOADING_STEP = "organismLoadingStep";
 
 	//DbXref Primary Accessions
 	public static final String DBXREF_PRIMARY_ACCESSIONS_STAGING_STEP = "dbXRefPrimaryAcessionsStagingStep";
@@ -137,12 +141,12 @@ public class LoadStocksJobBatchConfiguration {
 	public static final String DB_CVTERM_LOADING_STEP = "dbCVTermLookupLoadingStep";
 	public static final String STOCK_CROSSREFERENCES_LOADING_STEP = "stockCrossReferencesLoadingStep";
 
-	public static final String STOCK_PROPERTIES_STAGING_CLEANUP_STEP = "stockPropertiesStagingCleanupStep";
-
 	public static final String STOCK_PROPERTIES_MASTER_STAGING_LOADING_STEP = "stockPropertiesMasterStagingLoadingStep";
-
 	public static final String STOCK_PROPERTIES_STAGING_LOADING_STEP = "stockPropertiesStagingLoadingStep";
 	public static final String STOCK_PROPERTIES_BULK_LOADING_STEP = "stockPropertiesBulkLoadingStep";
+	
+	public static final String STOCK_PROPERTIES_STAGING_CLEANUP_STEP = "stockPropertiesStagingCleanupStep";
+
 	public static final String GERMPLASM_MASTER_LOADING_STEP = "germplasmMasterLoadingStep";
 
 	@Autowired
@@ -278,6 +282,10 @@ public class LoadStocksJobBatchConfiguration {
 	
 	@Autowired
 	public StockPostLoadingTasklet stockPostLoadingTasklet;
+	
+	//Organism Tasklet
+	@Autowired
+	BulkLoadOrganismTasklet bulkLoadOrganismTasklet;
 
 	@Autowired
 	private TaskExecutor taskExecutor;
@@ -323,18 +331,15 @@ public class LoadStocksJobBatchConfiguration {
 		return jobs
 				.get(MAIN_JOB)
 				.listener(protocolListener())
-				// .start(stockMasterLoadingStep())
-				// .next(dbLookupLoadingStep())
-				// .start(dbLookupLoadingStep()).next(stockMasterLoadingStep())
-				.start(batchSchemaInitStep()).next(stagingSchemaInitStep())
-				.next(generalModuleInitStep()).next(dbLookupLoadingStep())
-				.next(stageDbXrefExistingStockAccessionsStep())
-				.next(dbXrefMasterLoadingStep())
-				.next(dbXrefPrimaryAccessionsPostLoadingStep())
-				.next(stockStagingPreloadingTasklet())
-				.next(stockSourceMasterLoadingStep())
-				.next(stockPostLoadingTasklet())
-				//.next(stockMasterLoadingStep())
+				 .start(batchSchemaInitStep()).next(stagingSchemaInitStep())
+				 .next(organismLoadingStep())
+				//.next(generalModuleInitStep()).next(dbLookupLoadingStep())
+				//.next(stageDbXrefExistingStockAccessionsStep())
+				//.next(dbXrefMasterLoadingStep())
+				//.next(dbXrefPrimaryAccessionsPostLoadingStep())
+				//.next(stockStagingPreloadingTasklet())
+				//.next(stockSourceMasterLoadingStep())
+				//.next(stockPostLoadingTasklet())
 				//.next(dbStockPropertiesCVTermLookup())
 				//.next(stagingStockPropertiesCleanup())
 				//.next(stepStockPropertyMaster())
@@ -554,6 +559,14 @@ public class LoadStocksJobBatchConfiguration {
 
 		return stepBuilders.get(STOCK_PROPERTIES_STAGING_CLEANUP_STEP)
 				.tasklet(stagingStockPropertiesTruncateTasklet()).build();
+
+	}
+	
+	@Bean
+	public Step organismLoadingStep() {
+
+		return stepBuilders.get(ORGANISM_LOADING_STEP)
+				.tasklet(bulkLoadOrganismTasklet).build();
 
 	}
 

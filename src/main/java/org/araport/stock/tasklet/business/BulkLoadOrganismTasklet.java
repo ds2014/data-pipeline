@@ -1,5 +1,6 @@
 package org.araport.stock.tasklet.business;
 
+import javax.annotation.PostConstruct;
 import javax.sql.DataSource;
 
 import org.apache.commons.logging.Log;
@@ -26,7 +27,7 @@ import org.springframework.stereotype.Component;
 public class BulkLoadOrganismTasklet implements Tasklet {
 
 	private static final Log log = LogFactory
-			.getLog(BulkLoadStockPropertiesTasklet.class);
+			.getLog(BulkLoadOrganismTasklet.class);
 
 	private static final String LOAD_ORGANISM_SQL_PATH = "/sql/transformations/organism/load_match_organism.sql";
 	private static final String LOAD_ORGANISM_SQL = FileUtils
@@ -37,6 +38,10 @@ public class BulkLoadOrganismTasklet implements Tasklet {
 	private static final String LOAD_ECOTYPE_ACCESSIONSM_SQL = FileUtils
 			.getSqlFileContents(LOAD_ECOTYPE_ACCESSIONS_SQL_PATH);
 
+	private static final String LOAD_ECOTYPE_ORGANISM_DBXREF_ACCESSIONS_SQL_PATH = "/sql/transformations/organism/load_organism_dbxref.sql";
+	private static final String LOAD_ECOTYPE_ORGANISM_DBXREF_ACCESSIONS = FileUtils
+			.getSqlFileContents(LOAD_ECOTYPE_ORGANISM_DBXREF_ACCESSIONS_SQL_PATH);
+	
 	@Autowired
 	Environment environment;
 
@@ -49,7 +54,7 @@ public class BulkLoadOrganismTasklet implements Tasklet {
 	private GeneralDao generalDao;
 	
 	@Override
-	public RepeatStatus execute(StepContribution arg0, ChunkContext arg1)
+	public RepeatStatus execute(StepContribution step, ChunkContext context)
 			throws Exception {
 		
 	
@@ -67,11 +72,28 @@ public class BulkLoadOrganismTasklet implements Tasklet {
 
 				generalDao.executeSQL(LOAD_ECOTYPE_ACCESSIONSM_SQL);
 				
+	   // 3. Load Organism DbXRef Ecotypes Accessions
+				
+				log.info("Injected Organism DbXRef Ecotypes Accessions SQL:"
+						+ LOAD_ECOTYPE_ORGANISM_DBXREF_ACCESSIONS);
+				log.info("Loading Organism DbXRef Ecotypes Accessions...");
+
+				generalDao.executeSQL(LOAD_ECOTYPE_ORGANISM_DBXREF_ACCESSIONS);
+				
 				
 				return RepeatStatus.FINISHED;
 	   
 				
 				
 	}
+	
+	@PostConstruct
+	public void setDao() {
+
+		this.generalDao = new GeneralDaoImpl();
+		this.generalDao.setDataSource(targetDataSource);
+
+	}
+
 
 }

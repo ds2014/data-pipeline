@@ -31,6 +31,11 @@ public class BulkLoadOrganismTasklet implements Tasklet {
 	private static final String LOAD_ORGANISM_SQL_PATH = "/sql/transformations/organism/load_match_organism.sql";
 	private static final String LOAD_ORGANISM_SQL = FileUtils
 			.getSqlFileContents(LOAD_ORGANISM_SQL_PATH);
+	
+	
+	private static final String LOAD_ECOTYPE_ACCESSIONS_SQL_PATH = "/sql/transformations/organism/load_ecotype_accessions.sql";
+	private static final String LOAD_ECOTYPE_ACCESSIONSM_SQL = FileUtils
+			.getSqlFileContents(LOAD_ECOTYPE_ACCESSIONS_SQL_PATH);
 
 	@Autowired
 	Environment environment;
@@ -48,14 +53,25 @@ public class BulkLoadOrganismTasklet implements Tasklet {
 			throws Exception {
 		
 	
-		// 1. Copy loaded Stock Properties to Staging Backup Properties Table
-				log.info("Injected Load Organism SQL:"
+		// 1. Load  Ecotypes Table
+				log.info("Injected Load Ecotypes to Organism Table SQL:"
 						+ LOAD_ORGANISM_SQL);
-				log.info("Loading Organisms...");
+				log.info("Loading Ecotypes to Organism Table...");
 
 				generalDao.executeSQL(LOAD_ORGANISM_SQL);
 				
+		// 2. Load Ecotypes DbxRef Accessions
+				log.info("Injected Ecotypes DbxRef Accessions SQL:"
+						+ LOAD_ECOTYPE_ACCESSIONSM_SQL);
+				log.info("Loading Ecotypes DbxRef Accessions...");
+
+				generalDao.executeSQL(LOAD_ECOTYPE_ACCESSIONSM_SQL);
+				
+				
 				return RepeatStatus.FINISHED;
+	   
+				
+				
 	}
 
 }

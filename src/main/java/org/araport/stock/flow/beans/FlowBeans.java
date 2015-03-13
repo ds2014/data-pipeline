@@ -1,5 +1,6 @@
 package org.araport.stock.flow.beans;
 
+import org.araport.stock.tasklet.business.BulkLoadOrganismTasklet;
 import org.araport.stock.tasklet.business.GeneralModuleInitTasklet;
 import org.araport.stock.tasklet.business.DbXrefPrimaryStockAccessionsPostLoadTasklet;
 import org.araport.stock.tasklet.business.StockPostLoadingTasklet;
@@ -41,6 +42,12 @@ public class FlowBeans {
 	@Bean
 	public StockPostLoadingTasklet stockPostLoadingTasklet(){
 		return new StockPostLoadingTasklet();
+	}
+	
+	
+	@Bean
+	public BulkLoadOrganismTasklet bulkLoadOrganismTasklet(){
+		return new BulkLoadOrganismTasklet();
 	}
 	
 }

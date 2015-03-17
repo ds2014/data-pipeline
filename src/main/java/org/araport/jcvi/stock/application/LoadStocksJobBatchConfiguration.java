@@ -83,6 +83,7 @@ import org.araport.stock.tasklet.business.DbXrefPrimaryStockAccessionsPostLoadTa
 import org.araport.stock.tasklet.business.GeneralModuleInitTasklet;
 import org.araport.stock.tasklet.business.StockPostLoadingTasklet;
 import org.araport.stock.tasklet.business.StockPropertiesCVTermLookupTasklet;
+import org.araport.stock.tasklet.data.download.ImportOracleDataToPostgresTasklet;
 import org.araport.stock.tasklet.staging.BatchSchemaInitTasklet;
 import org.araport.stock.tasklet.staging.StageDbXrefExistingStockAccessionsTasklet;
 import org.araport.stock.tasklet.staging.StagingSchemaInitTasklet;
@@ -122,6 +123,10 @@ public class LoadStocksJobBatchConfiguration {
 	
 	//Organism
 	public static final String ORGANISM_LOADING_STEP = "organismLoadingStep";
+	
+	//Oracle Data Import
+	public static final String ORACLE_DATA_LOADING_STEP = "oracleDataLoadingStep";
+	
 
 	//DbXref Primary Accessions
 	public static final String DBXREF_PRIMARY_ACCESSIONS_STAGING_STEP = "dbXRefPrimaryAcessionsStagingStep";
@@ -286,6 +291,11 @@ public class LoadStocksJobBatchConfiguration {
 	//Organism Tasklet
 	@Autowired
 	BulkLoadOrganismTasklet bulkLoadOrganismTasklet;
+	
+	//Import Oracle Data Tasklet
+	@Autowired
+	ImportOracleDataToPostgresTasklet importOracleDataToPostgresTasklet;
+	
 
 	@Autowired
 	private TaskExecutor taskExecutor;
@@ -333,13 +343,14 @@ public class LoadStocksJobBatchConfiguration {
 				.listener(protocolListener())
 				 .start(batchSchemaInitStep()).next(stagingSchemaInitStep())
 				 .next(organismLoadingStep())
+				// .next(oracleDataLoadingStep())
 				//.next(generalModuleInitStep()).next(dbLookupLoadingStep())
-				//.next(stageDbXrefExistingStockAccessionsStep())
-				//.next(dbXrefMasterLoadingStep())
-				//.next(dbXrefPrimaryAccessionsPostLoadingStep())
-				//.next(stockStagingPreloadingTasklet())
-				//.next(stockSourceMasterLoadingStep())
-				//.next(stockPostLoadingTasklet())
+				.next(stageDbXrefExistingStockAccessionsStep())
+				.next(dbXrefMasterLoadingStep())
+				.next(dbXrefPrimaryAccessionsPostLoadingStep())
+				.next(stockStagingPreloadingTasklet())
+				.next(stockSourceMasterLoadingStep())
+				.next(stockPostLoadingTasklet())
 				//.next(dbStockPropertiesCVTermLookup())
 				//.next(stagingStockPropertiesCleanup())
 				//.next(stepStockPropertyMaster())
@@ -567,6 +578,14 @@ public class LoadStocksJobBatchConfiguration {
 
 		return stepBuilders.get(ORGANISM_LOADING_STEP)
 				.tasklet(bulkLoadOrganismTasklet).build();
+
+	}
+	
+	@Bean
+	public Step oracleDataLoadingStep() {
+
+		return stepBuilders.get(ORACLE_DATA_LOADING_STEP)
+				.tasklet(importOracleDataToPostgresTasklet).build();
 
 	}
 

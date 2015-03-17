@@ -13,6 +13,7 @@ public class StockSourceRowMapper implements RowMapper<Stock> {
 		
 		Stock stock = new Stock();
 		stock.setStockId(rs.getLong("stock_id"));
+		stock.setOrganismId(rs.getInt("organism_id"));
 		stock.setDbxrefId(rs.getInt("dbxref_id"));
 		stock.setName(rs.getString("name"));
 		stock.setStockTypeId(rs.getInt("type_id"));

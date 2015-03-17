@@ -33,10 +33,17 @@ public class StockStagingPreloadingTasklet implements Tasklet{
 	private static final String DISABLE_CHADO_STOCK_CONSTRAINTS_SQL = FileUtils
 			.getSqlFileContents(DISABLE_CHADO_STOCK_CONSTRAINTS_SQL_PATH);
 
+	private static final String CREATE_GERMPLASM_SOURCE_SQL_PATH = "/sql/transformations/stock/germplasm_source.sql";
+	private static final String CREATE_GERMPLASM_SOURCE_SQL = FileUtils
+			.getSqlFileContents(CREATE_GERMPLASM_SOURCE_SQL_PATH);
+	
 	private static final String CREATE_NOT_EXISTING_STOCK_MVVIEW_SQL_PATH = "/sql/transformations/stock/create_non_existing_tair_stocks_mvview.sql";
 	private static final String CREATE_NOT_EXISTING_STOCK_SQL = FileUtils
 			.getSqlFileContents(CREATE_NOT_EXISTING_STOCK_MVVIEW_SQL_PATH);
 
+	
+	//germplasm_source.sql
+	
 	@Autowired
 	Environment environment;
 
@@ -63,7 +70,15 @@ public class StockStagingPreloadingTasklet implements Tasklet{
 		log.info("Creating Backup of Chado Stock Table ...");
 
 		generalDao.executeSQL(CREATE_STAGING_BK_CHADO_SQL);
+		
+		//germplasm source
 
+		log.info("Injected: Germplasm Source SQL:"
+				+ CREATE_GERMPLASM_SOURCE_SQL);
+		log.info("Creating Germplasm Source SQL ...");
+
+		generalDao.executeSQL(CREATE_GERMPLASM_SOURCE_SQL);
+		
 		log.info("Injected: Disable Constraints on Chado Stock Table SQL:"
 				+ DISABLE_CHADO_STOCK_CONSTRAINTS_SQL);
 		log.info("Disable Constraints on Chado Table ...");

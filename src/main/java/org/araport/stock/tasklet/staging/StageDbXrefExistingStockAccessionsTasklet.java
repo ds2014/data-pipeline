@@ -37,6 +37,12 @@ public class StageDbXrefExistingStockAccessionsTasklet implements Tasklet {
 	private static final String CREATE_NOT_EXISTING_STOCK_ACCESSIONS_DBXREF_SQL = FileUtils
 			.getSqlFileContents(CREATE_NOT_EXISTING_STOCK_ACCESSIONS_DBXREF_MVVIEW_SQL_PATH);
 
+	private static final String CREATE_NOT_EXISTING_GERMPLASM_ACCESSIONS_DBXREF_MVVIEW_SQL_PATH =
+						"/sql/transformations/dbxref/primary_stock_accession/create_not_existing_primary_germplasm_accessions_chado_dbxref_mvview.sql";
+	
+	private static final String CREATE_NOT_EXISTING_GERMPLASM_ACCESSIONS_DBXREF_SQL = FileUtils
+			.getSqlFileContents(CREATE_NOT_EXISTING_GERMPLASM_ACCESSIONS_DBXREF_MVVIEW_SQL_PATH);
+
 	@Autowired
 	Environment environment;
 
@@ -65,17 +71,22 @@ public class StageDbXrefExistingStockAccessionsTasklet implements Tasklet {
 		generalDao.executeSQL(DISABLE_DBXREF_CONSTRAINTS_SQL);
 
 		// Should not clear DbXref since they might be used by Loaded Stocks
-		//log.info("Injected: Delete Existing Stock Accessions from DbXref Table SQL:"
-			//	+ DELETE_EXISTING_ACCESSIONS_DBXREF_SQL);
-		//log.info("Deleting Existing Stock Accessions from DbXref Table ...");
+		// log.info("Injected: Delete Existing Stock Accessions from DbXref Table SQL:"
+		// + DELETE_EXISTING_ACCESSIONS_DBXREF_SQL);
+		// log.info("Deleting Existing Stock Accessions from DbXref Table ...");
 
-	//	generalDao.executeSQL(DELETE_EXISTING_ACCESSIONS_DBXREF_SQL);
+		// generalDao.executeSQL(DELETE_EXISTING_ACCESSIONS_DBXREF_SQL);
 
-		log.info("Injected: Create Non Existing Stock Accessions Materialized View SQL:"
-				+ CREATE_NOT_EXISTING_STOCK_ACCESSIONS_DBXREF_SQL);
-		log.info("Creating Non Existing Stock Accessions Materialized View ...");
+		//log.info("Injected: Create Non Existing Stock Accessions Materialized View SQL:"
+			//	+ CREATE_NOT_EXISTING_STOCK_ACCESSIONS_DBXREF_SQL);
+		//log.info("Creating Non Existing Stock Accessions Materialized View ...");
 
-		generalDao.executeSQL(CREATE_NOT_EXISTING_STOCK_ACCESSIONS_DBXREF_SQL);
+		log.info("Injected: Create Non Existing Germplasm Accessions Materialized View SQL:"
+			+ CREATE_NOT_EXISTING_GERMPLASM_ACCESSIONS_DBXREF_SQL);
+			
+		log.info("Creating Non Existing Germplasm Accessions Materialized View ...");
+		
+		generalDao.executeSQL(CREATE_NOT_EXISTING_GERMPLASM_ACCESSIONS_DBXREF_SQL);
 
 		return RepeatStatus.FINISHED;
 

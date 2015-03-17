@@ -8,6 +8,9 @@ DROP MATERIALIZED VIEW IF EXISTS staging.stock_properties_all CASCADE;
 DROP MATERIALIZED VIEW IF EXISTS staging.stock_properties CASCADE;
 DROP MATERIALIZED VIEW IF EXISTS staging.tair_non_existing_stocks CASCADE;
 
+ALTER TABLE chado.stock ALTER COLUMN stock_id TYPE bigint;
+ALTER TABLE chado.stock_dbxref ALTER COLUMN stock_id TYPE bigint;
+
 DROP SEQUENCE IF EXISTS staging.global_id_sequence CASCADE;
 CREATE SEQUENCE staging.global_id_sequence;
 
@@ -47,7 +50,7 @@ AS
    BEGIN
       SELECT
        INTO result      dbxref_id
-       FROM dbxref
+       FROM chado.dbxref
       WHERE accession = $1;
 
       RETURN result;
@@ -65,7 +68,7 @@ AS
    BEGIN
       SELECT
        INTO result      db_id
-       FROM db
+       FROM chado.db
       WHERE name =$1;
 
       RETURN result;

@@ -253,8 +253,8 @@ ALTER TABLE ONLY batch_step_execution_context
 --
 
 REVOKE ALL ON SCHEMA batch FROM PUBLIC;
-REVOKE ALL ON SCHEMA batch FROM tripal2;
-GRANT ALL ON SCHEMA batch TO trupal2;
+REVOKE ALL ON SCHEMA batch FROM tripal1;
+GRANT ALL ON SCHEMA batch TO trupal1;
 GRANT ALL ON SCHEMA batch TO PUBLIC;
 
 --ALTER DATABASE mchado SET search_path=chado,public,batch,tair_stg;

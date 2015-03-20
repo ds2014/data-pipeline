@@ -90,7 +90,7 @@ public class StockPropertiesCVTermLookupTasklet implements Tasklet {
 		log.info("Injected SQL:" + sql);
 		dbDao.executeSQL(sql);
 
-		Db stockTermDb = dbDao.findDbByName("stock term");
+		Db stockTermDb = dbDao.findDbByName("stock_term");
 
 		if (stockTermDb == null) {
 			throw new StockLoaderException(

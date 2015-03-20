@@ -32,6 +32,10 @@ public class StagingSchemaInitTasklet implements Tasklet{
 	private static final String STAGING_SCHEMA_INIT_SQL = FileUtils
 			.getSqlFileContents(STAGING_SCHEMA_INIT_SQL_PATH);
 	
+	private static final String STAGING_TABLES_INIT_SQL_PATH = "/sql/schema/staging/init_staging_tables.sql";
+	private static final String STAGING_TABLES_INIT_SQL = FileUtils
+			.getSqlFileContents(STAGING_TABLES_INIT_SQL_PATH);
+	
 	private static final String STAGING_STOCKPROP_MVVIEW_ALL_PATH = "/sql/schema/staging/mvviews/create_mv_view_stock_properties_all.sql";
 	private static final String STAGING_STOCKPROP_MVVIEW_ALL_SQL = FileUtils
 			.getSqlFileContents(STAGING_STOCKPROP_MVVIEW_ALL_PATH);
@@ -48,6 +52,11 @@ public class StagingSchemaInitTasklet implements Tasklet{
 	private static final String STAGING_STOCKPROP_INDEX_MVVIEW_EXISTING_PATH = "/sql/schema/staging/mvviews/create_index_mv_stock_properties_existing.sql";
 	private static final String STAGING_STOCKPROP_INDEX_MVVIEW_EXISTINGL_SQL = FileUtils
 			.getSqlFileContents(STAGING_STOCKPROP_INDEX_MVVIEW_EXISTING_PATH);
+
+	private static final String STAGING_STOCK_CVTERM_MVVIEW_PATH = "/sql/transformations/stock_cvterm/create_stock_cvterm_mvview.sql";
+	private static final String STAGING_STOCK_CVTERM_MVVIEW_SQL = FileUtils
+			.getSqlFileContents(STAGING_STOCK_CVTERM_MVVIEW_PATH);
+	
 	
 	@Autowired
 	Environment environment;
@@ -69,6 +78,11 @@ public class StagingSchemaInitTasklet implements Tasklet{
 
 		generalDao.executeSQL(STAGING_SCHEMA_INIT_SQL);
 		
+		log.info("Injected Init Staging Tables SQL:" + STAGING_TABLES_INIT_SQL);
+		log.info("Initializing Staging Tables...");
+
+		generalDao.executeSQL(STAGING_TABLES_INIT_SQL);
+		
 		log.info("Injected Create All TAIR Stock Properties Materialized View SQL:" + STAGING_STOCKPROP_MVVIEW_ALL_SQL);
 		log.info("Creating All TAIR Stock Properties Materialized View...");
 
@@ -88,6 +102,11 @@ public class StagingSchemaInitTasklet implements Tasklet{
 		log.info("Creating Index for Ingested Stocks Materialized View...");
 
 		generalDao.executeSQL(STAGING_STOCKPROP_INDEX_MVVIEW_EXISTINGL_SQL);
+		
+		log.info("Injected Create Stock CVTerm Materialized Views SQL:" + STAGING_STOCK_CVTERM_MVVIEW_SQL);
+		log.info("Creating Create Stock CVTerm Materialized Views...");
+
+		generalDao.executeSQL(STAGING_STOCK_CVTERM_MVVIEW_SQL);
 
 		return RepeatStatus.FINISHED;
 

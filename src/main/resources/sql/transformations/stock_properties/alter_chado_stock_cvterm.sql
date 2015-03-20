@@ -1,0 +1,1 @@
+ALTER TABLE chado.stock_cvterm ALTER COLUMN stock_id TYPE bigint;

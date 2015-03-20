@@ -4,12 +4,14 @@ SET search_path = chado, public, batch, tair_stg, staging;
 
 
 DROP TABLE IF EXISTS staging.stockprop CASCADE;
+DROP TABLE IF EXISTS staging.stock_cvterm CASCADE;
+
 DROP MATERIALIZED VIEW IF EXISTS staging.stock_properties_all CASCADE;
 DROP MATERIALIZED VIEW IF EXISTS staging.stock_properties CASCADE;
 DROP MATERIALIZED VIEW IF EXISTS staging.tair_non_existing_stocks CASCADE;
 
-ALTER TABLE chado.stock ALTER COLUMN stock_id TYPE bigint;
-ALTER TABLE chado.stock_dbxref ALTER COLUMN stock_id TYPE bigint;
+--ALTER TABLE chado.stock ALTER COLUMN stock_id TYPE bigint;
+--ALTER TABLE chado.stock_dbxref ALTER COLUMN stock_id TYPE bigint;
 
 DROP SEQUENCE IF EXISTS staging.global_id_sequence CASCADE;
 CREATE SEQUENCE staging.global_id_sequence;
@@ -29,17 +31,6 @@ BEGIN
     result := result | (seq_id);
 END;  
 $$ LANGUAGE PLPGSQL;
-
-
-CREATE TABLE staging.stockprop (
-    stockprop_id bigint default staging.id_generator(),
-	stock_id bigint,
-	type_id int4,
-	"value" text,
-	"rank" int4 DEFAULT 0
-);
-
-
 
 CREATE OR REPLACE FUNCTION staging.get_dbxref_by_accession (text)
    RETURNS int
@@ -147,6 +138,26 @@ AS
 		result := NULL;
 	END IF;
        		       
+      RETURN result;
+   END;
+   $$
+   LANGUAGE plpgsql;
+   
+   
+  CREATE OR REPLACE FUNCTION staging.match_cvterm_by_name_cv (text, text)
+   RETURNS int
+AS
+   $$
+   DECLARE
+      result   int;
+    BEGIN
+      SELECT
+       INTO result  cvterm_id
+       FROM chado.cvterm c
+	   		join cv on
+			cv.cv_id = c.cv_id
+      WHERE c.name =$1 and cv.name=$2;
+
       RETURN result;
    END;
    $$

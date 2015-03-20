@@ -4,16 +4,19 @@ import org.araport.stock.domain.Stock;
 import org.araport.stock.domain.StockPropertySource;
 import org.araport.stock.processor.DbXrefBatchProcessor;
 import org.araport.stock.processor.StockBatchItemProcessor;
+import org.araport.stock.processor.StockCVTermItemProcessor;
 import org.araport.stock.processor.StockItemProcessor;
 import org.araport.stock.processor.StockPropertyItemProcessor;
 import org.araport.stock.reader.StockPropertiesItemReader;
 import org.araport.stock.rowmapper.DbXrefRowMapper;
 import org.araport.stock.rowmapper.DbXrefSourceRowMapper;
 import org.araport.stock.rowmapper.SourceStockDrivingQueryRowMapper;
+import org.araport.stock.rowmapper.StockCVTermSourceRowMapper;
 import org.araport.stock.rowmapper.StockPropertiesSourceRowMapper;
 import org.araport.stock.rowmapper.StockPropertyRowMapper;
 import org.araport.stock.rowmapper.StockRowMapper;
 import org.araport.stock.rowmapper.StockSourceRowMapper;
+import org.araport.stock.writer.StockCVTermJdbcBatchWriter;
 import org.araport.stock.writer.StockItemWriter;
 import org.araport.stock.writer.StockJdbcBatchWriter;
 import org.araport.stock.writer.StockPropertyItemWriter;
@@ -95,4 +98,15 @@ public class RowMapperBeans {
 		return new StockSourceRowMapper();
 	}
 		
+	@Bean
+	public StockCVTermItemProcessor stockCVTermItemProcessor(){
+		return new StockCVTermItemProcessor();
+	}
+	
+	@Bean
+	public      StockCVTermSourceRowMapper stockCVTermSourceRowMapper(){
+		return new StockCVTermSourceRowMapper();
+	}
+	
+
 }

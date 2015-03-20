@@ -3,9 +3,9 @@ package org.araport.stock.domain;
 public class StockCVTermSource {
 	
 	private long stockId;
-	private String cvTermId;
+	private int cvTermId;
 	private String pubId;
-	private boolean is_not;
+	private boolean predicate;
 	private int rank;
 	
 
@@ -17,11 +17,11 @@ public class StockCVTermSource {
 		this.stockId = stockId;
 	}
 
-	public String getCvTermId() {
+	public int getCvTermId() {
 		return cvTermId;
 	}
 
-	public void setCvTermId(String cvTermId) {
+	public void setCvTermId(int cvTermId) {
 		this.cvTermId = cvTermId;
 	}
 
@@ -33,12 +33,12 @@ public class StockCVTermSource {
 		this.pubId = pubId;
 	}
 
-	public boolean isIs_not() {
-		return is_not;
+	public boolean getPredicate() {
+		return predicate;
 	}
 
-	public void setIs_not(boolean is_not) {
-		this.is_not = is_not;
+	public void setPredicate(boolean predicate) {
+		this.predicate = predicate;
 	}
 
 	public int getRank() {
@@ -53,17 +53,17 @@ public class StockCVTermSource {
 		
 	}
 	
-	public StockCVTermSource(long stockId, String cvTermId, boolean is_not) {
+	public StockCVTermSource(long stockId, int cvTermId, boolean predicate) {
 		super();
 		this.stockId = stockId;
 		this.cvTermId = cvTermId;
-		this.is_not = is_not;
+		this.predicate = predicate;
 	}
 	
 	@Override
 	public String toString() {
 		return "StockCVTermSource [stockId=" + stockId + ", cvTermId="
-				+ cvTermId + ", pubId=" + pubId + ", is_not=" + is_not
+				+ cvTermId + ", pubId=" + pubId + ", is_not=" + predicate
 				+ ", rank=" + rank + "]";
 	}
 

@@ -1,6 +1,8 @@
 package org.araport.stock.flow.beans;
 
+import org.araport.stock.processor.StockCVTermItemProcessor;
 import org.araport.stock.tasklet.business.BulkLoadOrganismTasklet;
+import org.araport.stock.tasklet.business.BulkLoadStockCVTermTasklet;
 import org.araport.stock.tasklet.business.GeneralModuleInitTasklet;
 import org.araport.stock.tasklet.business.DbXrefPrimaryStockAccessionsPostLoadTasklet;
 import org.araport.stock.tasklet.business.StockPostLoadingTasklet;
@@ -56,4 +58,10 @@ public class FlowBeans {
 		return new ImportOracleDataToPostgresTasklet();
 	}
 	
+	
+	@Bean
+	public 
+	BulkLoadStockCVTermTasklet bulkLoadStockCVTermTasklet(){
+		return new BulkLoadStockCVTermTasklet();
+	}
 }

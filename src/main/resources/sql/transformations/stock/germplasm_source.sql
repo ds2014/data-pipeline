@@ -24,7 +24,7 @@ substring(
 	s.name as text)
 	as uniquename,
 	case 
-		when (s.stock_description is null)
+		when (s.stock_description is null or length(trim(s.stock_description)) = 0)
 			then cast(s.description as text)
 		else
 			cast(s.description as text) || ' Stock Description:' || cast(s.stock_description as text)
@@ -88,7 +88,7 @@ substring(
 	s.name as text)
 	as uniquename,
 	case 
-		when (s.stock_description is null)
+		when (s.stock_description is null or length(trim(s.stock_description)) = 0)
 			then cast(s.description as text)
 		else
 			cast(s.description as text) || ' Stock Description:' || cast(s.stock_description as text)

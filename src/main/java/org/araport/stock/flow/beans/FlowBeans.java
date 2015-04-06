@@ -1,8 +1,12 @@
 package org.araport.stock.flow.beans;
 
 import org.araport.stock.processor.StockCVTermItemProcessor;
+import org.araport.stock.tasklet.business.BulkLoadGermplasmSynonymsTasklet;
 import org.araport.stock.tasklet.business.BulkLoadOrganismTasklet;
 import org.araport.stock.tasklet.business.BulkLoadStockCVTermTasklet;
+import org.araport.stock.tasklet.business.BulkLoadStockDbxrefAccessionsTasklet;
+import org.araport.stock.tasklet.business.BulkLoadStockRelationshipTasklet;
+import org.araport.stock.tasklet.business.BulkLoadStockSynonymsTasklet;
 import org.araport.stock.tasklet.business.GeneralModuleInitTasklet;
 import org.araport.stock.tasklet.business.DbXrefPrimaryStockAccessionsPostLoadTasklet;
 import org.araport.stock.tasklet.business.StockPostLoadingTasklet;
@@ -64,4 +68,32 @@ public class FlowBeans {
 	BulkLoadStockCVTermTasklet bulkLoadStockCVTermTasklet(){
 		return new BulkLoadStockCVTermTasklet();
 	}
+	
+	@Bean
+	public StagingStockRelationshipPreloadingTasklet stagingStockRelationshipPreloadingTasklet(){
+		return new StagingStockRelationshipPreloadingTasklet();
+	}
+	
+	@Bean
+	public BulkLoadStockRelationshipTasklet bulkLoadStockRelationshipTasklet(){
+		return new BulkLoadStockRelationshipTasklet();
+	}
+	
+	@Bean
+	public BulkLoadGermplasmSynonymsTasklet bulkLoadGermplasmSynonymsTasklet(){
+		return new BulkLoadGermplasmSynonymsTasklet();
+	}
+	
+
+	@Bean
+	public BulkLoadStockSynonymsTasklet bulkLoadStockSynonymsTasklet(){
+		return new BulkLoadStockSynonymsTasklet();
+	}
+	
+	@Bean
+	public BulkLoadStockDbxrefAccessionsTasklet bulkLoadStockDbxrefAccessionsTasklet(){
+		return new BulkLoadStockDbxrefAccessionsTasklet();
+	}
+	
+	
 }

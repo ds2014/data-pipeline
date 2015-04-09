@@ -2,6 +2,7 @@ package org.araport.stock.flow.beans;
 
 import org.araport.stock.processor.StockCVTermItemProcessor;
 import org.araport.stock.tasklet.business.BulkLoadGermplasmSynonymsTasklet;
+import org.araport.stock.tasklet.business.BulkLoadOrganismPropertiesTasklet;
 import org.araport.stock.tasklet.business.BulkLoadOrganismTasklet;
 import org.araport.stock.tasklet.business.BulkLoadStockCVTermTasklet;
 import org.araport.stock.tasklet.business.BulkLoadStockDbxrefAccessionsTasklet;
@@ -93,6 +94,11 @@ public class FlowBeans {
 	@Bean
 	public BulkLoadStockDbxrefAccessionsTasklet bulkLoadStockDbxrefAccessionsTasklet(){
 		return new BulkLoadStockDbxrefAccessionsTasklet();
+	}
+	
+	@Bean
+	public BulkLoadOrganismPropertiesTasklet bulkLoadOrganismPropertiesTasklet(){
+		return new BulkLoadOrganismPropertiesTasklet();
 	}
 	
 	

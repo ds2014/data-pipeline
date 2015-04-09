@@ -56,7 +56,7 @@ SET
     abbreviation = s.abbreviation,
 	genus = s.genus,
 	species = s.species,
-	common_name = s.common_name,
+	common_name = s.abbrev_name,
 	type_id = s.cvterm_id,
 	infraspecific_name = s.infraspecific_name
 	
@@ -87,7 +87,7 @@ SELECT
 	s.genus,
 	s.species,
 	s.cvterm_id,
-	s.common_name,
+	s.abbrev_name,
 	s.infraspecific_name
 FROM
 	result_source s
@@ -102,6 +102,6 @@ GROUP BY
 	s.abbreviation,
 	s.genus,
 	s.species,
-	s.common_name,
+	s.abbrev_name,
 	s.cvterm_id,
 	s.infraspecific_name;

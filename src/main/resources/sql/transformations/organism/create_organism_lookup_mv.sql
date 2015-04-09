@@ -1,3 +1,4 @@
+DROP MATERIALIZED VIEW IF EXISTS staging.organism_lookup_mv CASCADE;
 CREATE
 	MATERIALIZED VIEW staging.organism_lookup_mv AS WITH organism_source AS(
 SELECT

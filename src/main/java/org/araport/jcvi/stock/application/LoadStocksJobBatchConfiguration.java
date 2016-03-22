@@ -351,32 +351,13 @@ public class LoadStocksJobBatchConfiguration {
 				.next(stockStagingPreloadingTasklet())
 				.next(stockSourceMasterLoadingStep())
 				.next(stockPostLoadingTasklet())
-				//.next(dbStockPropertiesCVTermLookup())
-				//.next(stagingStockPropertiesCleanup())
-				//.next(stepStockPropertyMaster())
-				//.next(dbBulkLoadingStockProperties())
+				.next(dbStockPropertiesCVTermLookup())
+				.next(stagingStockPropertiesCleanup())
+				.next(stepStockPropertyMaster())
+				.next(dbBulkLoadingStockProperties())
 				.build();
 	}
 
-	/*
-	 * @Bean public Step step(){ return
-	 * stepBuilderFactory.get("step").listener(stepStartStopListener())
-	 * .<DbXref,DbXref>chunk(1) //important to be one in this case to commit
-	 * after every line read //.reader(dbXRefReader()) .reader(dbReader)
-	 * .processor(dbXrefProcessor()) .writer(writer())
-	 * .listener(logProcessListener()) .faultTolerant() .build(); }
-	 */
-
-	// last working config
-	/*
-	 * @Bean public Step step(){ return
-	 * stepBuilderFactory.get("step").listener(stepStartStopListener())
-	 * .<SourceStockDrivingQuery,DbXref>chunk(50) //important to be one in this
-	 * case to commit after every line read //.reader(dbXRefReader())
-	 * .reader(sourceStockReader) .processor(dbXrefProcessor())
-	 * .writer(writer()) .listener(logProcessListener()) .faultTolerant()
-	 * .build(); }
-	 */
 
 	@Bean
 	public Step batchSchemaInitStep() {
@@ -663,10 +644,6 @@ public class LoadStocksJobBatchConfiguration {
 		return masterStep;
 	}
 
-	/*
-	 * @Bean public ItemProcessor<DbXref, DbXref> dbXrefProcessor() { return new
-	 * DbXrefItemProcessor(); }
-	 */
 
 	@Bean
 	public ItemProcessor<SourceStockDrivingQuery, DbXref> dbXrefProcessor() {

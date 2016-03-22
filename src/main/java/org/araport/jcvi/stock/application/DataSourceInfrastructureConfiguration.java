@@ -28,51 +28,6 @@ public class DataSourceInfrastructureConfiguration implements InfrastructureConf
 	@Autowired
 	private ResourceLoader resourceLoader;
 	
-	/*
-	@PostConstruct
-	protected void initialize() {
-		ResourceDatabasePopulator populator = new ResourceDatabasePopulator();
-		populator.addScript(resourceLoader.getResource(environment
-				.getProperty("batch.schema.script")));
-		populator.setContinueOnError(true);
-		DatabasePopulatorUtils.execute(populator, dataSource());
-	}
-	
-	@Bean(name = "batchDataSource1", destroyMethod = "close")
-	@Primary
-	public DataSource dataSource() {
-		BasicDataSource dataSource = new BasicDataSource();
-		dataSource.setDriverClassName(environment
-				.getProperty("batch.jdbc.driver"));
-		dataSource.setUrl(environment.getProperty("batch.jdbc.url"));
-		dataSource.setUsername(environment.getProperty("batch.jdbc.user"));
-		dataSource.setPassword(environment.getProperty("batch.jdbc.password"));
-		return dataSource;
-	}
-	
-
-	
-	@Bean(name = "tairDataSource", destroyMethod = "close")
-	public DataSource tairDataSource() {
-		BasicDataSource dataSource = new BasicDataSource();
-		dataSource.setDriverClassName(environment
-				.getProperty("source.batch.jdbc.driver"));
-		dataSource.setUrl(environment.getProperty("source.batch.jdbc.url"));
-		dataSource.setUsername(environment.getProperty("source.batch.jdbc.user"));
-		dataSource.setPassword(environment.getProperty("source.batch.jdbc.password"));
-		return dataSource;
-	}
-	
-	
-	
-
-	@Bean   
-	public PlatformTransactionManager sourceTransactionManager() {
-	    return new DataSourceTransactionManager(tairDataSource());
-	}
-	
-	*/
-	
 	
 	@Bean(name = "targetDataSource", destroyMethod = "close")
 	public DataSource dataSource() {
